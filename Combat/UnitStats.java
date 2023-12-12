@@ -109,6 +109,10 @@ public class UnitStats
         return SkillsParam.get(x);
     }
     //Zwracanie wartości
+    public String ReturnName()
+    {
+        return Name;
+    }
     public Integer ReturnHP()
     {
         return HP;

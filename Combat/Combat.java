@@ -2,11 +2,8 @@ package Combat;
 
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.Random;
 
 import ProjectGame.OtherFunctions;
-import Combat.CombatCommands;
-import ItemObjects.Weapons;
 
 public class Combat 
 {
@@ -61,21 +58,10 @@ public class Combat
         OtherFunctions.clearScreen();
         while(!EndFight)
         {
-            System.out.println(visual);
-            System.out.println("+---------------++---------------+");
-            String Pvalue = "Gracz";
-            String Evalue = name;
-            System.out.println("|"+OtherFunctions.FormatValues(" ","Gracz",15,2)+"||"+OtherFunctions.FormatValues(" ",Evalue,15,2)+"|");
-            System.out.println("|"+OtherFunctions.FormatValues(" ","PZ:"+PlayerStats.ReturnHP().toString()+"/"+PlayerStats.ReturnMaxHP().toString(),15,2)+"||"+OtherFunctions.FormatValues(" ",OtherFunctions.FormatValues(" ","PZ:"+EnemyStats.ReturnHP().toString()+"/"+EnemyStats.ReturnMaxHP().toString(),15,2),15,2)+"|");
-            System.out.println("|"+OtherFunctions.FormatValues(" ","PA:"+PlayerStats.ReturnMana().toString()+"/"+PlayerStats.ReturnMaxMana().toString(),15,2)+"||"+OtherFunctions.FormatValues(" ",OtherFunctions.FormatValues(" ","PA:"+EnemyStats.ReturnMana().toString()+"/"+EnemyStats.ReturnMaxMana().toString(),15,2),15,2)+"|");
-            //System.out.println("|"+OtherFunctions.FormatValues(" ","SZ:"+PlayerStats.ReturnSpeed().toString(),15,2)+"||"+OtherFunctions.FormatValues(" ","SZ:"+EnemyStats.ReturnSpeed().toString(),15,2)+"|");
-            //System.out.println("|"+OtherFunctions.FormatValues(" ","OB:"+PlayerStats.ReturnDMG().toString(),15,2)+"||"+OtherFunctions.FormatValues(" ","OB:"+EnemyStats.ReturnDMG().toString(),15,2)+"|");
-            //System.out.println("|"+OtherFunctions.FormatValues(" ","DE:"+PlayerStats.ReturnArmor().toString(),15,2)+"||"+OtherFunctions.FormatValues(" ","DE:"+EnemyStats.ReturnArmor().toString(),15,2)+"|");
-            System.out.println("+---------------++---------------+");
-            
+            CombatCommands.CombatWindow(PlayerStats, EnemyStats, visual);
             if(PlayerAttack)    //Atak Gracza
             {
-                System.out.println("Dostępne akcje");
+                System.out.println("Dostępne akcje (Ofensywa)");
                 System.out.println(CombatCommands.AllSkillInfo(PlayerActions));
                 System.out.println("Podaj numer akcji (1-"+PlayerActions.size()+")");
                 Action = s.nextLine();
@@ -123,7 +109,7 @@ public class Combat
                                             DefenceValue = EnemyStats.ReturnDMG() + EnemyStats.ReturnArmor();
                                         }
                                         if(EnemyActions.get(y).equals(AllSkills.lightAttack)) //Lekki atak
-                                        {//(int) Math.ceil((double) a / b));
+                                        {
                                             Integer Chance = OtherFunctions.RandInt(0,20);
                                             if(Chance < 10+EnemyStats.ReturnSpeed()-PlayerStats.ReturnSpeed())
                                             {
@@ -138,7 +124,7 @@ public class Combat
                                         {
                                             DefenceValue = EnemyStats.ReturnArmor();
                                         }
-                                        CombatCommands.Result(EnemyStats,AttackValue,DefenceValue);
+                                        CombatCommands.Result(EnemyStats,AttackValue,DefenceValue,true);
                                         DeffenceActionDone = true;
                                     }
                                 }
@@ -171,15 +157,133 @@ public class Combat
                 }
                 else
                 {
-                    
                     System.out.println("Nie znana komenda.");
                 }
             }
             else //Atak przeciwnika
             {
-                PlayerAttack = true;
                 OtherFunctions.clearScreen();
-                System.out.println(name+": Wykonuje ruch");
+                Boolean OffenceActionDone = false;
+                while(!OffenceActionDone)
+                {
+                    Integer y = OtherFunctions.RandInt(0,EnemyActions.size()-1);
+                    //Sprawdzenie czy można użyć akcji
+                    if(EnemyStats.ReturnMana() < CombatCommands.TheCheapestAction(EnemyActions,true) || EnemyActions.size() <= 1)
+                    {
+                        //Koniec tury przeciwnika
+                        for(int i=EnemyActions.size();i<4;i++)
+                        {
+                            int n;
+                            n = OtherFunctions.RandInt(0,EnemyStats.AmountOfSkills());
+                            EnemyActions.add(EnemyStats.ReturnSkillByIndex(n));
+                        }
+                        EnemyStats.ResetMana();
+                        EnemyActions.remove(EnemyActions.get(y));
+                        EnemyActions.add(AllSkills.Wait);
+                        
+                        OffenceActionDone = true;
+                        PlayerAttack = true;
+
+                        OtherFunctions.clearScreen();
+                        System.out.println(name+": Kończy turę");
+                    }
+                    else
+                    {
+                        if(EnemyActions.get(y).ReturnCost() <= EnemyStats.ReturnMana())
+                        {
+                            //Atak Przeciwnika
+                            Integer AttackValue = 0;
+                            Integer DefenceValue = 0;
+                            
+                            EnemyStats.ChangeMana(-EnemyActions.get(y).ReturnCost());        //Zmniejszenie punktów akcji
+                            //Atak Przeciwnika
+                            if(EnemyActions.get(y).equals(AllSkills.normalAttack)) //Zwykły atak
+                            {
+                                AttackValue = new Integer(EnemyStats.ReturnDMG());
+                            }
+                            else if(EnemyActions.get(y).equals(AllSkills.lightAttack)) //Lekki atak
+                            {
+                                AttackValue = new Integer(( (int) Math.ceil((double) EnemyStats.ReturnDMG()/2)));
+                            }
+                            else if(EnemyActions.get(y).equals(AllSkills.heavyAttack)) //Ciężki atak
+                            {
+                                AttackValue = new Integer(( (int) Math.ceil((double) EnemyStats.ReturnDMG()*1.5)));
+                            }
+                            //Akcja Defensywna gracza
+                            Boolean PlayerActionDone = false;
+                            while(!PlayerActionDone)
+                            {
+                                //Dane
+                                System.out.println(EnemyActions.get(y).ReturnName("O")+" - Wartość Ataku = "+AttackValue);    //Wypisanie akcji
+                                CombatCommands.CombatWindow(PlayerStats, EnemyStats, visual);    //Wyświetlenie okna walki
+                                System.out.println("Dostępne akcje (Defensywa)");
+                                System.out.println(CombatCommands.AllSkillInfo(PlayerActions));
+                                System.out.println("Podaj numer akcji (1-"+PlayerActions.size()+")");
+                                Action = s.nextLine();
+                                if(Action.equals("1") || Action.equals("2") || Action.equals("3") || Action.equals("4") || Action.equals("5")) //Odpowiednia komenda
+                                {
+                                    if(Integer.valueOf(Action) <= PlayerActions.size()) //Czy komenda mieści się w zakresie
+                                    {
+                                        Integer x = Integer.valueOf(Action) - 1;
+                                        if(PlayerActions.get(x).ReturnCost() <= PlayerStats.ReturnMana())   //Czy stać na umięjętność
+                                        {
+                                            PlayerStats.ChangeMana(-PlayerActions.get(x).ReturnCost());     //Zużycie punktów Akcji
+                                            if(!PlayerActions.get(x).equals(AllSkills.Wait))                //Czy nie jest akcją końca tury
+                                            {
+                                                //Wybranie odpowiedniej akcji obronnej
+                                                if(PlayerActions.get(x).equals(AllSkills.normalAttack))     //Obrona
+                                                {
+                                                    DefenceValue = PlayerStats.ReturnDMG() + PlayerStats.ReturnArmor();
+                                                }
+                                                if(PlayerActions.get(x).equals(AllSkills.lightAttack))      //Unik
+                                                {
+                                                    Integer Chance = OtherFunctions.RandInt(0,20);
+                                                    if(Chance < 10+PlayerStats.ReturnSpeed()-EnemyStats.ReturnSpeed())
+                                                    {
+                                                        DefenceValue = AttackValue;
+                                                    }
+                                                    else
+                                                    {
+                                                        DefenceValue = PlayerStats.ReturnArmor();
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                //Przyjęcie ciosu
+                                                DefenceValue = PlayerStats.ReturnArmor();
+                                            }
+                                            OtherFunctions.clearScreen();
+                                            System.out.println(EnemyActions.get(y).ReturnName("O")+" vs "+PlayerActions.get(x).ReturnName("D"));
+                                            if(!PlayerActions.get(x).equals(AllSkills.Wait))
+                                            {
+                                                PlayerActions.remove(PlayerActions.get(x));
+                                            }
+                                            PlayerActionDone = true;
+                                        }
+                                        else
+                                        {
+                                            System.out.println("Nie wystarczająca liczba punktów akcji");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        System.out.println("Nie znana komenda");
+                                    }
+                                }
+                                else
+                                {
+                                    System.out.println("Nie znana komenda");
+                                }
+                            }
+                            CombatCommands.Result(PlayerStats,AttackValue,DefenceValue,false);
+                        }
+                        else
+                        {
+                            System.out.println("Brak Many");
+                        }
+                    }
+                }
             }
         }
     }

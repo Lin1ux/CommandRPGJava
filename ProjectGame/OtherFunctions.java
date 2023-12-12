@@ -1,8 +1,5 @@
 package ProjectGame;
 
-import java.util.ArrayList;
-
-import Combat.Skills;
 
 public class OtherFunctions 
 {

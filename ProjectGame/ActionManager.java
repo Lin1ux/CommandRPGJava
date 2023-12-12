@@ -35,6 +35,7 @@ public class ActionManager
         
         //Gracz
         PlayerStats = new UnitStats(50,12,7,5,6,5); //Dokończyć ustawić obrażenia na 2
+        PlayerStats.SetName("Ryszard");
         PlayerStats.AddSkill(AllSkills.normalAttack);
         PlayerStats.AddSkill(AllSkills.lightAttack);
         PlayerStats.AddSkill(AllSkills.heavyAttack);
@@ -44,7 +45,7 @@ public class ActionManager
         ArrayList<Items> StartItems = new ArrayList<>();
         StartItems.add(compas);
         Inventory = new Inventory(firstWeapon,
-            new Armor("Skórzany płaszcz","Stary zużyt płaszcz, który wciąż pełni funkcję ochronne",5),
+            new Armor("Skórzany płaszcz","Stary zużyty płaszcz, który wciąż pełni funkcję ochronne",5),
             StartItems);
         Inventory.SetCurrentWeapon(firstWeapon);
 
