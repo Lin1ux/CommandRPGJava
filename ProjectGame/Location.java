@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 import Combat.UnitStats;
 import ItemObjects.Weapons;
+import ItemObjects.Armor;
 
 public class Location 
 {
@@ -55,9 +56,9 @@ public class Location
         Integer newLocation = locationId;
         if(commandsList.contains("drzwi"))
         {
-            if(locationId == 0)
+            if(locationId == AllLocations.House)
             {
-                newLocation = 1;        //Chatka
+                newLocation = AllLocations.Armadillo;        //Chatka
             }
         }
         return newLocation;
@@ -67,9 +68,9 @@ public class Location
         Integer newLocation = locationId;
         if(commandsList.contains("chatka"))
         {
-            if(locationId == 1)
+            if(locationId == AllLocations.Armadillo)
             {
-                newLocation = 0;        //Chatka
+                newLocation = AllLocations.House;        //Chatka
             }
         }
         return newLocation;
@@ -79,9 +80,9 @@ public class Location
         Integer newLocation = locationId;
         if(commandsList.contains("polnoc"))
         {
-            if(locationId == 1)
+            if(locationId == AllLocations.Armadillo)
             {
-                newLocation = 4;        //Wózek
+                newLocation = AllLocations.Cart;        //Wózek
             }
         }
         return newLocation;
@@ -91,9 +92,9 @@ public class Location
         Integer newLocation = locationId;
         if(commandsList.contains("poludnie"))
         {
-            if(locationId == 4)
+            if(locationId == AllLocations.Cart)
             {
-                newLocation = 1;        //Chatka
+                newLocation = AllLocations.Armadillo;        //Chatka
             }
         }
         return newLocation;
@@ -103,9 +104,13 @@ public class Location
         Integer newLocation = locationId;
         if(commandsList.contains("wschod"))
         {
-            if(locationId == 1)
+            if(locationId == AllLocations.Armadillo)
             {
-                newLocation = 2;        //droga
+                newLocation = AllLocations.Road;        //Droga
+            }
+            else if(locationId == AllLocations.Road)
+            {
+                newLocation = AllLocations.Village;        //Wioska
             }
         }
         return newLocation;
@@ -115,9 +120,13 @@ public class Location
         Integer newLocation = locationId;
         if(commandsList.contains("zachod"))
         {
-            if(locationId == 2)
+            if(locationId == AllLocations.Road)
             {
-                newLocation = 1;        //Chatka
+                newLocation = AllLocations.Armadillo;        //Chatka
+            }
+            else if(locationId == AllLocations.Village)
+            {
+                newLocation = AllLocations.Road;        //Droga
             }
         }
         return newLocation;
@@ -157,6 +166,57 @@ public class Location
             return;
         }
     }
+    public void Armorer(Scanner s)
+    {
+        if(commandsList.contains("platnerz"))
+        {
+            String PlayerInput = "";
+            while(!PlayerInput.toLowerCase().equals("wyjscie") && !PlayerInput.toLowerCase().equals("wy"))
+            {
+                OtherFunctions.clearScreen();
+                System.out.println("Płatnerz: Witaj w moim sklepie czy chcesz zobaczyć moje towary?");
+                System.out.println(visual);
+                System.out.println("Dostępne komendy:");
+                System.out.println("[sklep, wyjscie]");
+                System.out.println("Co robisz?");
+                PlayerInput = s.nextLine();
+                if(PlayerInput.toLowerCase().equals("sklep") && !PlayerInput.toLowerCase().equals("sk"))
+                {
+                    //Przedmioty do kupienia
+                    ArrayList<Armor> ShopItems = new ArrayList<Armor>();
+                    ShopItems.add(new Armor("Kolczuga","Powszechna zbroja używana przez lekko uzbrojonych żołnierzy",5,6,30));
+                    ShopItems.add(new Armor("Stalowa Zbroja","Ceniona za wysoki poziom ochrony",7,5,50));
+                    ShopItems.add(new Armor("Łuskowa Zbroja","Lekka zbroja zrobiona z łusek dużego gada",3,6,15));
+                    PlayerInput = "";
+                    Boolean ItemBought = false; //czy kupiono przedmiot
+                    while(!ItemBought)
+                    {
+                        OtherFunctions.clearScreen();
+                        System.out.println("Dostępne towary:");
+                        for(int i=0;i<ShopItems.size();i++)
+                        {
+                            System.out.println((i+1)+") "+ShopItems.get(i).ReturnName()+" | Pancerz: "+ShopItems.get(i).ReturnArmor()+" | Szybkość: "+ShopItems.get(i).ReturnSpeed()+" | Koszt: "+ShopItems.get(i).ReturnCost());
+                        }
+                        System.out.println("Podaj wartość od 1-"+ShopItems.size()+":");
+                        PlayerInput = s.nextLine();
+                        try
+                        {
+                            //wybeiranie przedmiotów
+                            if(Integer.valueOf(PlayerInput) <= ShopItems.size()) //Czy komenda mieści się w zakresie
+                            {
+                                
+                            }
+                        }
+                        catch() //Dokończyć sklep 
+                        {
+                           System.out.println("Nie znana komenda"); 
+                        }
+
+                    }
+                }
+            }
+        }
+    }
     public void Sleep(UnitStats Player)
     {
         Player.Rest();
@@ -179,6 +239,10 @@ public class Location
         {
             commandsList.remove(commandName);
         }
+    }
+    public void SetVisual(String newVisual)
+    {
+        visual = newVisual;
     }
     public ArrayList<String> ReturnCommandList()
     {

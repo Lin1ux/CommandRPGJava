@@ -8,11 +8,13 @@ public class UnitStats
     Integer HP;
     Integer MaxHP;
     Integer DMG;
+    Integer DefaultDMG;
     Integer Mana;
     Integer MaxMana;
     Integer Armor;
+    Integer DefaultArmor;
     Integer Speed;
-    Integer MaxSpeed;
+    Integer DefaultSpeed;
     Integer Gold;
 
     ArrayList<Skills> SkillsParam;
@@ -21,17 +23,35 @@ public class UnitStats
     {
         MaxHP = newHP;
     }
+    //Obrażenia
     public void SetDMG(Integer newDMG)
     {
         DMG = newDMG;
+    }
+    public void SetDefaultDMG(Integer newDMG)
+    {
+        DefaultDMG = newDMG;
+    }
+    public void ResetDMG()
+    {
+        DMG = DefaultDMG;
     }
     public void SetMaxMana(Integer newMana)
     {
         MaxMana = newMana;
     }
+    //Pancerz
     public void SetArmor(Integer newArmor)
     {
         Armor = newArmor;
+    }
+    public void SetDefaultArmor(Integer newArmor)
+    {
+        DefaultArmor = newArmor;
+    }
+    public void ResetArmor()
+    {
+        Armor = DefaultArmor;
     }
     //Prędkość
     public void ChangeSpeed(Integer newSpeed)
@@ -40,11 +60,11 @@ public class UnitStats
     }
     public void ResetSpeed()
     {
-        Speed = MaxSpeed;
+        Speed = DefaultSpeed;
     }
-    public void SetMaxSpeed(Integer newSpeed)
+    public void SetDefaultSpeed(Integer newSpeed)
     {
-        MaxSpeed = newSpeed;
+        DefaultSpeed = newSpeed;
     }
     public void SetGold(Integer newGold)
     {
@@ -86,6 +106,14 @@ public class UnitStats
         if(Mana < 0)
         {
             Mana = 0;
+        }
+    }
+    public void ChangeGold(Integer addition)
+    {
+        Gold += addition;
+        if(Gold < 0)
+        {
+            Gold = 0;
         }
     }
     public void ResetMana()
@@ -141,23 +169,73 @@ public class UnitStats
     {
         return Armor;
     }
+    public Integer ReturnGold()
+    {
+        return Gold;
+    }
     public UnitStats()
     {
 
     }
-    public UnitStats(Integer newHP,Integer newDMG,Integer newMana,Integer newArmor,Integer newSpeed,Integer newGold)
+    public UnitStats(String name,Integer newHP,Integer newDMG,Integer newMana,Integer newArmor,Integer newSpeed,Integer newGold)
     {
-        Name = new String("???");
+        //Imie
+        if(!name.equals(""))
+        {
+            SetName(name);
+        }
+        else
+        {
+            SetName("???");
+        }
+        //Zdrowie
         SetMaxHP(newHP);
         this.HP = this.MaxHP;
-        SetDMG(newDMG);
+        //Obrażenia
+        SetDefaultDMG(newDMG);
+        ResetDMG();
+        //Punkty Akcji
         SetMaxMana(newMana);
         this.Mana = this.MaxMana;
-        SetArmor(newArmor);
-        SetMaxSpeed(newSpeed);
-        this.Speed = MaxSpeed;
+        //Pancerz
+        SetDefaultArmor(newArmor);
+        ResetArmor();
+        //Prędkość
+        SetDefaultSpeed(newSpeed);
+        ResetSpeed();
+        //Złoto
         SetGold(newGold);
         SkillsParam = new ArrayList<>();
+    }
+    public UnitStats(String name,Integer newHP,Integer newDMG,Integer newMana,Integer newArmor,Integer newSpeed,Integer newGold,ArrayList<Skills> Skills)
+    {
+        //Imie
+        if(!name.equals(""))
+        {
+            SetName(name);
+        }
+        else
+        {
+            SetName("???");
+        }
+        //Zdrowie
+        SetMaxHP(newHP);
+        this.HP = this.MaxHP;
+        //Obrażenia
+        SetDefaultDMG(newDMG);
+        ResetDMG();
+        //Punkty Akcji
+        SetMaxMana(newMana);
+        this.Mana = this.MaxMana;
+        //Pancerz
+        SetDefaultArmor(newArmor);
+        ResetArmor();
+        //Prędkość
+        SetDefaultSpeed(newSpeed);
+        ResetSpeed();
+        //Złoto
+        SetGold(newGold);
+        SkillsParam = Skills;
     }
     public void PrintStats()
     {

@@ -58,7 +58,8 @@ public class Inventory
                 System.out.println("Podaj nazwę broni aby ją założyć");
                 PlayerInput = scan.nextLine();
                 ChangeWeapon(PlayerInput);
-                Player.SetDMG(ReturnWeaponsDamage());
+                Player.SetDefaultDMG(ReturnWeaponsDamage());
+                Player.ResetDMG();
             }
             else if(PlayerInput.toLowerCase().equals("zbroja") || PlayerInput.toLowerCase().equals("z"))
             {
@@ -80,7 +81,10 @@ public class Inventory
                 System.out.println("Podaj nazwę zbroi aby ją założyć");
                 PlayerInput = scan.nextLine();
                 ChangeArmor(PlayerInput);
-                Player.SetArmor(ReturnArmorsDamage());
+                Player.SetDefaultArmor(ReturnArmorsValue());
+                Player.ResetArmor();
+                Player.SetDefaultSpeed(ReturnArmorsSpeed());
+                Player.ResetSpeed();
             }
             else if(PlayerInput.toLowerCase().equals("plecak") || PlayerInput.toLowerCase().equals("p"))
             {
@@ -179,8 +183,12 @@ public class Inventory
     {
         return CurrentWeapon.ReturnDamage();
     }
-    public Integer ReturnArmorsDamage()
+    public Integer ReturnArmorsValue()
     {
         return CurrentArmor.ReturnArmor();
+    }
+    public Integer ReturnArmorsSpeed()
+    {
+        return CurrentArmor.ReturnSpeed();
     }
 }

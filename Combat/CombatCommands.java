@@ -53,7 +53,7 @@ public class CombatCommands {
         }
         return min;
     }
-    public static void Result(UnitStats Deffender, Integer AttackValue, Integer DefenceValue,Boolean ResultForAttacker)
+    public static void Result(UnitStats Deffender, Integer AttackValue, Integer DefenceValue,Boolean ResultForAttacker,String OMessage, String DMessage)
     {
         Integer Diffrence = DefenceValue - AttackValue;
         System.out.println("Obrona: "+DefenceValue+" vs Atak: "+AttackValue);
@@ -79,6 +79,14 @@ public class CombatCommands {
             {
                 System.out.println("Obrona zakończyła się powodzeniem");
             }
+        }
+        if(!DMessage.equals(""))
+        {
+            System.out.println(DMessage);
+        }
+        else if(!OMessage.equals(""))
+        {
+            System.out.println(OMessage);
         }
     }
     public static void CombatWindow(UnitStats PlayerStats,UnitStats EnemyStats, String Visuals)

@@ -5,6 +5,7 @@ import java.util.Scanner;
 import Combat.UnitStats;
 import Combat.AllSkills;
 import Combat.Combat;
+import Combat.Units;
 
 import ItemObjects.Items;
 import ItemObjects.Weapons;
@@ -14,11 +15,6 @@ import ItemObjects.Armor;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-//import ProjectGame.UnitStats;
-//import ProjectGame.OtherFunctions;
-//import ProjectGame.Location;
-//import ProjectGame.Visuals;
-
 public class ActionManager 
 {
     private UnitStats PlayerStats;
@@ -27,6 +23,8 @@ public class ActionManager
     
     public void GameOn()
     {
+        System.out.println("test");
+        Boolean CombatWon = true;
         Boolean GameOver = false;
 
         //Wejście
@@ -34,39 +32,39 @@ public class ActionManager
         String Action = "";
         
         //Gracz
-        PlayerStats = new UnitStats(50,12,7,5,6,5); //Dokończyć ustawić obrażenia na 2
-        PlayerStats.SetName("Ryszard");
+        /*PlayerStats = new UnitStats("Ryszard",1,12,7,1,6,5); //Dokończyć ustawić obrażenia na 2
         PlayerStats.AddSkill(AllSkills.normalAttack);
         PlayerStats.AddSkill(AllSkills.lightAttack);
-        PlayerStats.AddSkill(AllSkills.heavyAttack);
+        PlayerStats.AddSkill(AllSkills.heavyAttack);*/
+        PlayerStats = Units.Ryszard;
         
         Items compas = new Items("Kompas","Kompas, który wskazuje inny kierunek niż północ");
-        Weapons firstWeapon = new Weapons("Pięści", "Każda istota może używać części ciała do walki", 2);
+        Weapons firstWeapon = new Weapons("Sztylet", "Dość stary ale wciąż wystarczająco ostry", 6);
         ArrayList<Items> StartItems = new ArrayList<>();
         StartItems.add(compas);
         Inventory = new Inventory(firstWeapon,
-            new Armor("Skórzany płaszcz","Stary zużyty płaszcz, który wciąż pełni funkcję ochronne",5),
+            new Armor("Skórzany płaszcz","Stary zużyty płaszcz, który wciąż pełni funkcję ochronne",2,6),
             StartItems);
         Inventory.SetCurrentWeapon(firstWeapon);
 
         ArrayList<String> GlobalCommands = new ArrayList<String>(Arrays.asList(new String[]{"ekwipunek","statystyki"}));
 
         //Lokacje
-        this.CurrentPosition = new Integer(0);
+        this.CurrentPosition = new Integer(AllLocations.House);
         ArrayList<Location> World = new ArrayList<Location>();
         ArrayList<String> Commands = new ArrayList<String>(Arrays.asList(new String[]{"drzwi","miecz"}));
         
-        Location SwordLocation = new Location(0,"Pokój z mieczem",Visuals.SwordVisual(),Commands);
+        Location SwordLocation = new Location(AllLocations.House,"Pokój z mieczem",Visuals.SwordVisual(),Commands);
         Commands = new ArrayList<String>(Arrays.asList(new String[]{"polnoc","wschod","chatka","postac"}));
-        Location SmallHouse = new Location(1,"Mała Chatka",Visuals.ArmadilloVisual(),Commands);
-        Commands = new ArrayList<String>(Arrays.asList(new String[]{"zachod","walka"}));
-        Location Road = new Location(2,"Droga",Visuals.GramlinVisual(),Commands);
-        Commands = new ArrayList<String>(Arrays.asList(new String[]{"zachod","platnerz","alchemik"}));
-        Location Village = new Location(3,"Wioska Dróżka",Visuals.RoadVisual(),Commands);
+        Location SmallHouse = new Location(AllLocations.Armadillo,"Mała Chatka",Visuals.ArmadilloVisual(),Commands);
+        Commands = new ArrayList<String>(Arrays.asList(new String[]{"zachod","walka","wschod"}));   //Dokończyć usunąć komendę wschód
+        Location Road = new Location(AllLocations.Road,"Droga",Visuals.GramlinVisual(),Commands);
+        Commands = new ArrayList<String>(Arrays.asList(new String[]{"zachod","platnerz","alchemik","karczma"}));
+        Location Village = new Location(AllLocations.Village,"Wioska Dróżka",Visuals.RoadVisual(),Commands);
         Commands = new ArrayList<String>(Arrays.asList(new String[]{"poludnie","walka"}));
-        Location Cart = new Location(4,"Wioska Dróżka",Visuals.EmptyVisual(),Commands);
+        Location Cart = new Location(AllLocations.Cart,"Zniszczony wóz",Visuals.EmptyVisual(),Commands);
         Commands = new ArrayList<String>(Arrays.asList(new String[]{"poludnie","wschod","zachod","karczma","kowal","sklep"}));
-        Location Town = new Location(5,"Miasteczko Piachy",Visuals.EmptyVisual(),Commands);
+        Location Town = new Location(AllLocations.Town,"Miasteczko Piachy",Visuals.EmptyVisual(),Commands);
 
         World.add(SwordLocation);           //0
         World.add(SmallHouse);              //1
@@ -76,35 +74,46 @@ public class ActionManager
         World.add(Town);                    //5
 
         //Przeciwnicy
-        UnitStats Enemy = new UnitStats(15,6,5,1,7,5);
-        //Enemy.AddSkill(AllSkills.normalAttack);
-        Enemy.AddSkill(AllSkills.lightAttack);
-        Enemy.AddSkill(AllSkills.normalAttack);
+        UnitStats Enemy = Units.Gremlin;
+        //Walki
         Combat Gremlin = new Combat( "Zgred",Visuals.GramlinVisual(),Enemy);
 
         while(!GameOver)
         {
             //Wyświetlanie lokacji
             World.get(CurrentPosition).SetInventory(Inventory);
-            if(CurrentPosition == 0)
+            if(CurrentPosition == AllLocations.House)
             {
                 World.get(CurrentPosition).SetGlobalCommands(GlobalCommands);
                 World.get(CurrentPosition).Description("Znajdujesz się w ciemnym pomieszczeniu");
             }
-            else if(CurrentPosition == 1)
+            else if(CurrentPosition == AllLocations.Armadillo)
             {
                 World.get(CurrentPosition).SetGlobalCommands(GlobalCommands);
                 World.get(CurrentPosition).Description("Zauważasz małą chatkę, a obok niej stoi dziwna postać w skorupie");
             }
-            else if(CurrentPosition == 2)
+            else if(CurrentPosition == AllLocations.Road)
             {
                 World.get(CurrentPosition).SetGlobalCommands(GlobalCommands);
-                World.get(CurrentPosition).Description("Na środku drogi stoi Zgredek, który nie chce przepuścić ciebie dalej");
+                if(World.get(CurrentPosition).ReturnCommandList().contains("walka"))
+                {
+                    World.get(CurrentPosition).Description("Na środku drogi stoi Zgredek, który nie chce przepuścić ciebie dalej");
+                }
+                else
+                {
+                    World.get(CurrentPosition).SetVisual(Visuals.RoadVisual());
+                    World.get(CurrentPosition).Description("Otaczają ciebie równiny");
+                }
             }
-            else if(CurrentPosition == 4)
+            else if(CurrentPosition == AllLocations.Village)
             {
                 World.get(CurrentPosition).SetGlobalCommands(GlobalCommands);
-                World.get(CurrentPosition).Description("Przed tobą znajduje się przewrócony wóz oraz Raptora atakującego jego właścicieli");
+                World.get(CurrentPosition).Description("Znajdujesz się w wiosce Dróżka");
+            }
+            else if(CurrentPosition == AllLocations.Cart)
+            {
+                World.get(CurrentPosition).SetGlobalCommands(GlobalCommands);
+                World.get(CurrentPosition).Description("Przed tobą zauważasz się przewrócony wóz oraz Raptora atakującego jego właścicieli");
             }
             //Komenda gracza
             if(Action.toLowerCase().equals("statystyki") || Action.toLowerCase().equals("st"))
@@ -126,19 +135,30 @@ public class ActionManager
                 OtherFunctions.clearScreen(); 
                 World.get(CurrentPosition).Sleep(PlayerStats);
             }
-            else if(Action.toLowerCase().equals("walka"))
+            else if(Action.toLowerCase().equals("walka") || Action.toLowerCase().equals("wa"))
             {
                 if(World.get(CurrentPosition).ReturnCommandList().contains("walka"))
                 {
-                    Gremlin.CombatScript(s,PlayerStats);
+                    if(CurrentPosition == 2)
+                    {
+                        CombatWon = Gremlin.CombatScript(s,PlayerStats);
+                        World.get(CurrentPosition).CommandManager("remove","walka");
+                        World.get(CurrentPosition).CommandManager("add","wschod");
+                    }
                 }
-                //Dokończyć Sprawdzić czy taka komenda jest dostępna
-                
-                //World.get(CurrentPosition).Sleep(PlayerStats);
+                Action = "";
+                continue;
             }
             else if(Action.toLowerCase().equals("miecz"))
             {   
                 World.get(CurrentPosition).Sword(s);
+            }
+            else if(Action.toLowerCase().equals("platnerz"))
+            {
+                World.get(CurrentPosition).Armorer(s);
+                OtherFunctions.clearScreen();
+                Action = "";
+                continue;
             }
             else if(Action.toLowerCase().equals("postac"))
             {   
@@ -190,6 +210,12 @@ public class ActionManager
                 Action = "";
                 OtherFunctions.clearScreen();
                 continue;
+            }
+            if(!CombatWon)
+            {
+                OtherFunctions.clearScreen();
+                System.out.println("Zostałeś pokonany");
+                GameOver = false;
             }
             if(!GameOver)
             {

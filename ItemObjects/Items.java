@@ -4,6 +4,7 @@ public class Items
 {
     String name;
     String Description;
+    Integer Cost;
     
     public String ShowDescription()
     {
@@ -16,6 +17,10 @@ public class Items
     public void SetDescr(String text)
     {
         this.Description = text; 
+    }
+    public void SetCost(Integer newCost)
+    {
+        this.Cost = newCost; 
     }
     public String ReturnName()
     {

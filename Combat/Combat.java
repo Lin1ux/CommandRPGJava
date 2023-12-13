@@ -15,8 +15,7 @@ public class Combat
     {
         SetName(newName);
         SetVisual(newVisual);
-        EnemyStats = new UnitStats(newHP,newDMG,newMana,newArmor,newSpeed,newGold);
-        EnemyStats.SetName(newName);
+        EnemyStats = new UnitStats(newName,newHP,newDMG,newMana,newArmor,newSpeed,newGold);
     }    
     public Combat(String newName,String newVisual,UnitStats enemy)
     {
@@ -25,18 +24,19 @@ public class Combat
         EnemyStats = enemy;
         EnemyStats.SetName(newName);
     }    
-    public void CombatScript(Scanner s,UnitStats PlayerStats)
+    public Boolean CombatScript(Scanner s,UnitStats PlayerStats)
     {
-        
-        UnitStats DefaultEStats = EnemyStats;
+        Boolean CombatWon = true;
+
         UnitStats DefaultPStats = PlayerStats; 
         ArrayList<Skills> EnemyActions = new ArrayList<Skills>();
         ArrayList<Skills> PlayerActions = new ArrayList<Skills>();
         String Action = "";
+        String AdditionalOMessage = "";
+        String AdditionalDMessage = "";
 
         Boolean EndFight = false;
         Boolean PlayerAttack;
-        Boolean NextCharacter = false;
         if(PlayerStats.ReturnSpeed()>EnemyStats.ReturnSpeed()) //Do kogo należy pierwszy atak
         {
             PlayerAttack = true;
@@ -61,6 +61,8 @@ public class Combat
             CombatCommands.CombatWindow(PlayerStats, EnemyStats, visual);
             if(PlayerAttack)    //Atak Gracza
             {
+                AdditionalOMessage = "";
+                AdditionalDMessage = "";
                 System.out.println("Dostępne akcje (Ofensywa)");
                 System.out.println(CombatCommands.AllSkillInfo(PlayerActions));
                 System.out.println("Podaj numer akcji (1-"+PlayerActions.size()+")");
@@ -78,7 +80,6 @@ public class Combat
                                 Integer AttackValue = 0;
                                 Integer DefenceValue = 0;
                                 
-                                System.out.println(PlayerActions.get(x).ReturnName("O"));
                                 PlayerStats.ChangeMana(-PlayerActions.get(x).ReturnCost());
                                 
                                 //Atak Gracza
@@ -124,8 +125,18 @@ public class Combat
                                         {
                                             DefenceValue = EnemyStats.ReturnArmor();
                                         }
-                                        CombatCommands.Result(EnemyStats,AttackValue,DefenceValue,true);
+                                        CombatCommands.Result(EnemyStats,AttackValue,DefenceValue,true,AdditionalOMessage,AdditionalDMessage);
                                         DeffenceActionDone = true;
+                                        if(PlayerStats.ReturnHP()<=0)
+                                        {
+                                            CombatWon = false;
+                                            EndFight = true;
+                                        }
+                                        else if(EnemyStats.ReturnHP()<=0)
+                                        {
+                                            CombatWon = true;
+                                            EndFight = true;
+                                        }
                                     }
                                 }
                                 PlayerActions.remove(PlayerActions.get(x));
@@ -133,7 +144,7 @@ public class Combat
                             }
                             else
                             {
-                                for(int i=PlayerActions.size();i<4;i++)
+                                for(int i=PlayerActions.size();i<5;i++)
                                 {
                                     int n;
                                     n = OtherFunctions.RandInt(0,PlayerStats.AmountOfSkills());
@@ -163,10 +174,16 @@ public class Combat
             else //Atak przeciwnika
             {
                 OtherFunctions.clearScreen();
+                AdditionalOMessage = "";
+                AdditionalDMessage = "";
                 Boolean OffenceActionDone = false;
                 while(!OffenceActionDone)
                 {
                     Integer y = OtherFunctions.RandInt(0,EnemyActions.size()-1);
+                    if(EnemyActions.get(y).equals(AllSkills.Wait))
+                    {
+                        continue;
+                    }
                     //Sprawdzenie czy można użyć akcji
                     if(EnemyStats.ReturnMana() < CombatCommands.TheCheapestAction(EnemyActions,true) || EnemyActions.size() <= 1)
                     {
@@ -247,6 +264,16 @@ public class Combat
                                                         DefenceValue = PlayerStats.ReturnArmor();
                                                     }
                                                 }
+                                                if(PlayerActions.get(x).equals(AllSkills.heavyAttack))      //Unik
+                                                {
+                                                    DefenceValue = PlayerStats.ReturnDMG() + PlayerStats.ReturnArmor();
+                                                    Integer Chance = OtherFunctions.RandInt(0,20);
+                                                    if(Chance < 10)
+                                                    {
+                                                        EnemyStats.ChangeMana(-1);
+                                                        AdditionalDMessage = "Blok Zredukował 1 punkt akcji przeciwnika";
+                                                    }
+                                                }
                                             }
                                             else
                                             {
@@ -276,16 +303,36 @@ public class Combat
                                     System.out.println("Nie znana komenda");
                                 }
                             }
-                            CombatCommands.Result(PlayerStats,AttackValue,DefenceValue,false);
-                        }
-                        else
-                        {
-                            System.out.println("Brak Many");
+                            CombatCommands.Result(PlayerStats,AttackValue,DefenceValue,false,AdditionalOMessage,AdditionalDMessage);
+                            if(PlayerStats.ReturnHP()<=0)
+                            {
+                                OffenceActionDone = true;
+                                CombatWon = false;
+                                EndFight = true;
+                            }
+                            else if(EnemyStats.ReturnHP()<=0)
+                            {
+                                OffenceActionDone = true;
+                                CombatWon = true;
+                                EndFight = true;
+                            }
                         }
                     }
                 }
             }
         }
+        //Koniec walki reset statystyk przyznanie złota
+        OtherFunctions.clearScreen();
+        if(CombatWon)
+        {
+            PlayerStats.SetArmor(DefaultPStats.ReturnArmor());
+            PlayerStats.SetDMG(DefaultPStats.ReturnDMG());
+            PlayerStats.ResetSpeed();
+            PlayerStats.ResetMana();
+            PlayerStats.ChangeGold(EnemyStats.ReturnGold());
+            System.out.println("Zwycięstwo! Otrzymujesz: "+EnemyStats.ReturnGold()+" złota");
+        }
+        return CombatWon;
     }
     private void SetName(String newName)
     {
