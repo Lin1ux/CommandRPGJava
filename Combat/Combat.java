@@ -112,7 +112,7 @@ public class Combat
                                         if(EnemyActions.get(y).equals(AllSkills.lightAttack)) //Lekki atak
                                         {
                                             Integer Chance = OtherFunctions.RandInt(0,20);
-                                            if(Chance < 10+EnemyStats.ReturnSpeed()-PlayerStats.ReturnSpeed())
+                                            if(Chance < 10+EnemyStats.ReturnSpeed()-PlayerStats.ReturnSpeed() && !PlayerActions.get(x).equals(AllSkills.lightAttack))
                                             {
                                                 DefenceValue = AttackValue;
                                             }
@@ -126,7 +126,9 @@ public class Combat
                                             DefenceValue = EnemyStats.ReturnArmor();
                                         }
                                         CombatCommands.Result(EnemyStats,AttackValue,DefenceValue,true,AdditionalOMessage,AdditionalDMessage);
+                                        EnemyActions.remove(EnemyActions.get(y));
                                         DeffenceActionDone = true;
+                                        //Sprawdzenie czy ktoś jest martwy
                                         if(PlayerStats.ReturnHP()<=0)
                                         {
                                             CombatWon = false;
@@ -179,23 +181,25 @@ public class Combat
                 Boolean OffenceActionDone = false;
                 while(!OffenceActionDone)
                 {
+                    //Losowanie akcji
                     Integer y = OtherFunctions.RandInt(0,EnemyActions.size()-1);
                     if(EnemyActions.get(y).equals(AllSkills.Wait))
                     {
+                        //Zapobieganie wybraniu pominięcia tury
                         continue;
                     }
-                    //Sprawdzenie czy można użyć akcji
+                    //Sprawdzenie czy można użyć akcji (przeciwnik będzie atakował dopóki posiada wystarczającą liczbę Punktów Akcji na najtańszą umiejętność)
                     if(EnemyStats.ReturnMana() < CombatCommands.TheCheapestAction(EnemyActions,true) || EnemyActions.size() <= 1)
                     {
                         //Koniec tury przeciwnika
-                        for(int i=EnemyActions.size();i<4;i++)
+                        for(int i=EnemyActions.size();i<5;i++)
                         {
                             int n;
                             n = OtherFunctions.RandInt(0,EnemyStats.AmountOfSkills());
                             EnemyActions.add(EnemyStats.ReturnSkillByIndex(n));
                         }
                         EnemyStats.ResetMana();
-                        EnemyActions.remove(EnemyActions.get(y));
+                        EnemyActions.remove(AllSkills.Wait);
                         EnemyActions.add(AllSkills.Wait);
                         
                         OffenceActionDone = true;
@@ -206,6 +210,7 @@ public class Combat
                     }
                     else
                     {
+                        //Czy koszt akcji się zgadza
                         if(EnemyActions.get(y).ReturnCost() <= EnemyStats.ReturnMana())
                         {
                             //Atak Przeciwnika
@@ -255,7 +260,7 @@ public class Combat
                                                 if(PlayerActions.get(x).equals(AllSkills.lightAttack))      //Unik
                                                 {
                                                     Integer Chance = OtherFunctions.RandInt(0,20);
-                                                    if(Chance < 10+PlayerStats.ReturnSpeed()-EnemyStats.ReturnSpeed())
+                                                    if(Chance < 10+PlayerStats.ReturnSpeed()-EnemyStats.ReturnSpeed() && !EnemyActions.get(y).equals(AllSkills.lightAttack))
                                                     {
                                                         DefenceValue = AttackValue;
                                                     }
@@ -264,9 +269,10 @@ public class Combat
                                                         DefenceValue = PlayerStats.ReturnArmor();
                                                     }
                                                 }
-                                                if(PlayerActions.get(x).equals(AllSkills.heavyAttack))      //Unik
+                                                if(PlayerActions.get(x).equals(AllSkills.heavyAttack))      //Blok
                                                 {
                                                     DefenceValue = PlayerStats.ReturnDMG() + PlayerStats.ReturnArmor();
+                                                    //Redukcja punktu Akcji 
                                                     Integer Chance = OtherFunctions.RandInt(0,20);
                                                     if(Chance < 10)
                                                     {
@@ -280,6 +286,7 @@ public class Combat
                                                 //Przyjęcie ciosu
                                                 DefenceValue = PlayerStats.ReturnArmor();
                                             }
+                                            //Wynik
                                             OtherFunctions.clearScreen();
                                             System.out.println(EnemyActions.get(y).ReturnName("O")+" vs "+PlayerActions.get(x).ReturnName("D"));
                                             if(!PlayerActions.get(x).equals(AllSkills.Wait))
@@ -304,6 +311,8 @@ public class Combat
                                 }
                             }
                             CombatCommands.Result(PlayerStats,AttackValue,DefenceValue,false,AdditionalOMessage,AdditionalDMessage);
+                            EnemyActions.remove(EnemyActions.get(y));
+                            //Sprawdzenie czy któryś z przeciwników jest martwy
                             if(PlayerStats.ReturnHP()<=0)
                             {
                                 OffenceActionDone = true;

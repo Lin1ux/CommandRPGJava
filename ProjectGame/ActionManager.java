@@ -10,7 +10,7 @@ import Combat.Units;
 import ItemObjects.Items;
 import ItemObjects.Weapons;
 import ItemObjects.Armor;
-
+import ItemObjects.ItemList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +23,6 @@ public class ActionManager
     
     public void GameOn()
     {
-        System.out.println("test");
         Boolean CombatWon = true;
         Boolean GameOver = false;
 
@@ -32,49 +31,28 @@ public class ActionManager
         String Action = "";
         
         //Gracz
-        /*PlayerStats = new UnitStats("Ryszard",1,12,7,1,6,5); //Dokończyć ustawić obrażenia na 2
-        PlayerStats.AddSkill(AllSkills.normalAttack);
-        PlayerStats.AddSkill(AllSkills.lightAttack);
-        PlayerStats.AddSkill(AllSkills.heavyAttack);*/
         PlayerStats = Units.Ryszard;
         
-        Items compas = new Items("Kompas","Kompas, który wskazuje inny kierunek niż północ");
-        Weapons firstWeapon = new Weapons("Sztylet", "Dość stary ale wciąż wystarczająco ostry", 6);
         ArrayList<Items> StartItems = new ArrayList<>();
-        StartItems.add(compas);
-        Inventory = new Inventory(firstWeapon,
-            new Armor("Skórzany płaszcz","Stary zużyty płaszcz, który wciąż pełni funkcję ochronne",2,6),
-            StartItems);
-        Inventory.SetCurrentWeapon(firstWeapon);
+        StartItems.add(ItemList.compass);
+        Inventory = new Inventory(ItemList.dagger,ItemList.leatherCoat,StartItems);
+        Inventory.SetCurrentWeapon(ItemList.dagger);
 
-        ArrayList<String> GlobalCommands = new ArrayList<String>(Arrays.asList(new String[]{"ekwipunek","statystyki"}));
+        ArrayList<String> GlobalCommands = new ArrayList<String>(Arrays.asList(new String[]{"ekwipunek","statystyki","umiejetnosci"}));
 
         //Lokacje
         this.CurrentPosition = new Integer(AllLocations.House);
         ArrayList<Location> World = new ArrayList<Location>();
-        ArrayList<String> Commands = new ArrayList<String>(Arrays.asList(new String[]{"drzwi","miecz"}));
-        
-        Location SwordLocation = new Location(AllLocations.House,"Pokój z mieczem",Visuals.SwordVisual(),Commands);
-        Commands = new ArrayList<String>(Arrays.asList(new String[]{"polnoc","wschod","chatka","postac"}));
-        Location SmallHouse = new Location(AllLocations.Armadillo,"Mała Chatka",Visuals.ArmadilloVisual(),Commands);
-        Commands = new ArrayList<String>(Arrays.asList(new String[]{"zachod","walka","wschod"}));   //Dokończyć usunąć komendę wschód
-        Location Road = new Location(AllLocations.Road,"Droga",Visuals.GramlinVisual(),Commands);
-        Commands = new ArrayList<String>(Arrays.asList(new String[]{"zachod","platnerz","alchemik","karczma"}));
-        Location Village = new Location(AllLocations.Village,"Wioska Dróżka",Visuals.RoadVisual(),Commands);
-        Commands = new ArrayList<String>(Arrays.asList(new String[]{"poludnie","walka"}));
-        Location Cart = new Location(AllLocations.Cart,"Zniszczony wóz",Visuals.EmptyVisual(),Commands);
-        Commands = new ArrayList<String>(Arrays.asList(new String[]{"poludnie","wschod","zachod","karczma","kowal","sklep"}));
-        Location Town = new Location(AllLocations.Town,"Miasteczko Piachy",Visuals.EmptyVisual(),Commands);
 
-        World.add(SwordLocation);           //0
-        World.add(SmallHouse);              //1
-        World.add(Road);                    //2
-        World.add(Village);                 //3
-        World.add(Cart);                    //4
-        World.add(Town);                    //5
+        World.add(AllLocations.SwordLocation);                   //0
+        World.add(AllLocations.SmallHouseLocation);              //1
+        World.add(AllLocations.RoadLocation);                    //2
+        World.add(AllLocations.VillageLocation);                 //3
+        World.add(AllLocations.CartLocation);                    //4
+        World.add(AllLocations.TownLocation);                    //5
 
         //Przeciwnicy
-        UnitStats Enemy = Units.Gremlin;
+        UnitStats Enemy = Units.Gramlin;
         //Walki
         Combat Gremlin = new Combat( "Zgred",Visuals.GramlinVisual(),Enemy);
 
@@ -115,17 +93,36 @@ public class ActionManager
                 World.get(CurrentPosition).SetGlobalCommands(GlobalCommands);
                 World.get(CurrentPosition).Description("Przed tobą zauważasz się przewrócony wóz oraz Raptora atakującego jego właścicieli");
             }
-            //Komenda gracza
+            //Komendy gracza
             if(Action.toLowerCase().equals("statystyki") || Action.toLowerCase().equals("st"))
             {
                 OtherFunctions.clearScreen();
+                System.out.println("Co robisz?");
                 PlayerStats.PrintStats();
+                
+                System.out.println(World.get(CurrentPosition).ReturnCommandList());
+                System.out.println(GlobalCommands);
+                System.out.println("Co robisz?");
+            }
+            else if(Action.toLowerCase().equals("umiejetnosci") || Action.toLowerCase().equals("u"))
+            {
+                OtherFunctions.clearScreen();
+                System.out.println("Dostępne umiejętności podczas walki");
+                for(int i=0;i<PlayerStats.AmountOfSkills();i++)
+                {
+                    System.out.println("---------------------");
+                    System.out.println("Koszt: "+PlayerStats.ReturnSkillByIndex(i).ReturnCost());
+                    System.out.println("O) "+PlayerStats.ReturnSkillByIndex(i).ReturnName("O")+" - "+PlayerStats.ReturnSkillByIndex(i).ReturnDescr("O"));
+                    System.out.println("D) "+PlayerStats.ReturnSkillByIndex(i).ReturnName("D")+" - "+PlayerStats.ReturnSkillByIndex(i).ReturnDescr("D"));
+                }
+                System.out.println("---------------------");
                 System.out.println(World.get(CurrentPosition).ReturnCommandList());
                 System.out.println(GlobalCommands);
                 System.out.println("Co robisz?");
             }
             else if(Action.toLowerCase().equals("ekwipunek") || Action.toLowerCase().equals("e"))
             {
+                //Ekwipunek
                 Inventory.InventoryMenu(s,PlayerStats);
                 Action = "";
                 continue;
@@ -155,7 +152,14 @@ public class ActionManager
             }
             else if(Action.toLowerCase().equals("platnerz"))
             {
-                World.get(CurrentPosition).Armorer(s);
+                World.get(CurrentPosition).Armorer(s,PlayerStats);
+                OtherFunctions.clearScreen();
+                Action = "";
+                continue;
+            }
+            else if(Action.toLowerCase().equals("karczma"))
+            {
+                World.get(CurrentPosition).Tavern(s,PlayerStats);
                 OtherFunctions.clearScreen();
                 Action = "";
                 continue;
@@ -163,11 +167,16 @@ public class ActionManager
             else if(Action.toLowerCase().equals("postac"))
             {   
                 OtherFunctions.clearScreen();
-                World.get(CurrentPosition).Dialog();
+                World.get(CurrentPosition).Armadillo(PlayerStats);
                 if(World.get(CurrentPosition).ReturnId() == 1)
                 {
                     World.get(0).CommandManager("Add", "odpoczynek");
                 }
+            }
+            else if(Action.toLowerCase().equals("trening"))
+            {   
+                OtherFunctions.clearScreen();
+                World.get(CurrentPosition).Armadillo(PlayerStats);
             }
             else if(Action.toLowerCase().equals("drzwi") || Action.toLowerCase().equals("dr"))
             {
@@ -214,12 +223,26 @@ public class ActionManager
             if(!CombatWon)
             {
                 OtherFunctions.clearScreen();
-                System.out.println("Zostałeś pokonany");
-                GameOver = false;
+                System.out.println("Zostałeś pokonany!");
+                System.out.println("Wciśnij Enter aby zakończyć grę.");
+                Action = s.nextLine();
+                GameOver = true;
             }
             if(!GameOver)
             {
-                Action = s.nextLine();  
+                Action = s.nextLine();
+                try
+                {
+                    //Możliwość wywoływania komend za pomocą
+                    if(Integer.valueOf(Action)-1 <= World.get(CurrentPosition).ReturnCommandList().size())
+                    {
+                        Action = World.get(CurrentPosition).ReturnCommandList().get(Integer.valueOf(Action)-1);
+                    }
+                }
+                catch(Exception e)
+                {
+
+                }  
             }
             OtherFunctions.clearScreen();
         }

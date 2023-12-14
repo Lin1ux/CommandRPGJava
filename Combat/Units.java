@@ -6,8 +6,8 @@ import java.util.Arrays;
 public class Units 
 {
     //Dokończyć zmienić dmg do 6
-    public static UnitStats Ryszard = new UnitStats("Ryszard",50,12,7,2,6,20,
+    public static UnitStats Ryszard = new UnitStats("Ryszard",50,12,7,2,6,50,
     new ArrayList<Skills>(Arrays.asList(new Skills[]{AllSkills.lightAttack,AllSkills.normalAttack,AllSkills.heavyAttack})));    
-    public static UnitStats Gremlin = new UnitStats("Zgred",15,6,5,1,7,15,
+    public static UnitStats Gramlin = new UnitStats("Zgred",15,6,5,1,7,15,
     new ArrayList<Skills>(Arrays.asList(new Skills[]{AllSkills.lightAttack,AllSkills.normalAttack})));
 }

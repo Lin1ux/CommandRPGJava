@@ -28,17 +28,17 @@ public class Inventory
     public void InventoryMenu(Scanner scan, UnitStats Player)
     {
         String PlayerInput = "";
-        while(!PlayerInput.toLowerCase().equals("wyjscie") && !PlayerInput.toLowerCase().equals("w"))
+        while(!PlayerInput.toLowerCase().equals("wyjscie") && !PlayerInput.toLowerCase().equals("w") && !PlayerInput.toLowerCase().equals("4"))
         {
             OtherFunctions.clearScreen();
             System.out.println("Ekwipunek");
-            System.out.println("|Używana broń:     |"+CurrentWeapon.ReturnName()+"| Obrażenia: "+CurrentWeapon.ReturnDamage().toString());
-            System.out.println("|Założony Pancerz: |"+  CurrentArmor.ReturnName()+"| Pancerz: "+   CurrentArmor.ReturnArmor().toString());
+            System.out.println("|Używana broń:     |"+CurrentWeapon.ReturnName()+"| Obrażenia: "+CurrentWeapon.ReturnDamage());
+            System.out.println("|Założony Pancerz: |"+  CurrentArmor.ReturnName()+"| Pancerz: "+CurrentArmor.ReturnArmor()+"| Szybkość: "+CurrentArmor.ReturnSpeed() );
             System.out.println("Komendy");
             System.out.println("[bron, zbroja, plecak, wyjscie]");
             System.out.println("Co chcesz zrobić? ");
             PlayerInput = scan.nextLine();
-            if(PlayerInput.toLowerCase().equals("bron") || PlayerInput.toLowerCase().equals("b"))
+            if(PlayerInput.toLowerCase().equals("bron") || PlayerInput.toLowerCase().equals("b") || PlayerInput.toLowerCase().equals("1"))
             {
                 OtherFunctions.clearScreen();
                 System.out.println("|Używana broń:     |"+CurrentWeapon.ReturnName()+"| Obrażenia: "+CurrentWeapon.ReturnDamage().toString());
@@ -61,16 +61,16 @@ public class Inventory
                 Player.SetDefaultDMG(ReturnWeaponsDamage());
                 Player.ResetDMG();
             }
-            else if(PlayerInput.toLowerCase().equals("zbroja") || PlayerInput.toLowerCase().equals("z"))
+            else if(PlayerInput.toLowerCase().equals("zbroja") || PlayerInput.toLowerCase().equals("z") || PlayerInput.toLowerCase().equals("2"))
             {
                 OtherFunctions.clearScreen();
-                System.out.println("|Używana zbroja:     |"+CurrentArmor.ReturnName()+"| Pancerz: "+CurrentArmor.ReturnArmor().toString());
+                System.out.println("|Używana zbroja:     | "+CurrentArmor.ReturnName()+"| Pancerz: "+CurrentArmor.ReturnArmor()+" | Szybkość: "+CurrentArmor.ReturnSpeed());
                 System.out.println("Posiadane zbroje:");
                 if(!Armors.isEmpty())
                 {
                     for(int i=0;i<Armors.size();i++)
                     {
-                        System.out.println(Armors.get(i).ReturnName()+"| Obrażenia "+Armors.get(i).ReturnArmor());
+                        System.out.println(Armors.get(i).ReturnName()+"| Pancerz "+Armors.get(i).ReturnArmor()+" | Szybkość: "+Armors.get(i).ReturnSpeed());
                     }
                 }
                 else
@@ -86,7 +86,7 @@ public class Inventory
                 Player.SetDefaultSpeed(ReturnArmorsSpeed());
                 Player.ResetSpeed();
             }
-            else if(PlayerInput.toLowerCase().equals("plecak") || PlayerInput.toLowerCase().equals("p"))
+            else if(PlayerInput.toLowerCase().equals("plecak") || PlayerInput.toLowerCase().equals("p") || PlayerInput.toLowerCase().equals("3"))
             {
                 String text = new String("");
                 while(!PlayerInput.toLowerCase().equals("wyjscie") && !PlayerInput.toLowerCase().equals("w"))
@@ -105,7 +105,7 @@ public class Inventory
                         System.out.println("Brak posiadanych przedmiotów");
                     }
                     System.out.println("--------------------------------");
-                    System.out.println("Podaj nazwę przedmotu aby zobaczyć go użyć lub zobaczyć jego opis (wpisz wyjscie aby wrócić )");
+                    System.out.println("Podaj nazwę przedmiotu aby zobaczyć go użyć lub zobaczyć jego opis (wpisz wyjscie aby wrócić )");
                     PlayerInput = scan.nextLine();
                     text = new String(ItemFunction(PlayerInput));
                 }
@@ -182,6 +182,10 @@ public class Inventory
     public Integer ReturnWeaponsDamage()
     {
         return CurrentWeapon.ReturnDamage();
+    }
+    public Weapons ReturnCurentWeapon()
+    {
+        return CurrentWeapon;
     }
     public Integer ReturnArmorsValue()
     {
