@@ -5,17 +5,19 @@ import java.util.Scanner;
 
 import ItemObjects.Weapons;
 import ItemObjects.Armor;
+import ItemObjects.ItemList;
 import ItemObjects.Items;
-
+import ItemObjects.ItemFunctions;
+import Combat.AllStatus;
 import Combat.UnitStats;
 
 public class Inventory 
 {
-    Weapons CurrentWeapon;
-    Armor CurrentArmor;
-    ArrayList<Items> OtherItems;
-    ArrayList<Weapons> Weapons;
-    ArrayList<Armor> Armors;
+    private Weapons CurrentWeapon;
+    private Armor CurrentArmor;
+    private ArrayList<Items> OtherItems;
+    private ArrayList<Weapons> Weapons;
+    private ArrayList<Armor> Armors;
 
     public Inventory(Weapons weapon, Armor armor,ArrayList<Items> items)
     {
@@ -25,7 +27,7 @@ public class Inventory
         this.Weapons = new ArrayList<Weapons>();
         this.Armors = new ArrayList<Armor>();
     }
-    public void InventoryMenu(Scanner scan, UnitStats Player)
+    public Integer InventoryMenu(Scanner s, UnitStats Player,Integer Position)
     {
         String PlayerInput = "";
         while(!PlayerInput.toLowerCase().equals("wyjscie") && !PlayerInput.toLowerCase().equals("w") && !PlayerInput.toLowerCase().equals("4"))
@@ -37,7 +39,7 @@ public class Inventory
             System.out.println("Komendy");
             System.out.println("[bron, zbroja, plecak, wyjscie]");
             System.out.println("Co chcesz zrobić? ");
-            PlayerInput = scan.nextLine();
+            PlayerInput = s.nextLine();
             if(PlayerInput.toLowerCase().equals("bron") || PlayerInput.toLowerCase().equals("b") || PlayerInput.toLowerCase().equals("1"))
             {
                 OtherFunctions.clearScreen();
@@ -56,7 +58,7 @@ public class Inventory
                 }
                 System.out.println("--------------------------------");
                 System.out.println("Podaj nazwę broni aby ją założyć");
-                PlayerInput = scan.nextLine();
+                PlayerInput = s.nextLine();
                 ChangeWeapon(PlayerInput);
                 Player.SetDefaultDMG(ReturnWeaponsDamage());
                 Player.ResetDMG();
@@ -79,7 +81,7 @@ public class Inventory
                 }
                 System.out.println("--------------------------------");
                 System.out.println("Podaj nazwę zbroi aby ją założyć");
-                PlayerInput = scan.nextLine();
+                PlayerInput = s.nextLine();
                 ChangeArmor(PlayerInput);
                 Player.SetDefaultArmor(ReturnArmorsValue());
                 Player.ResetArmor();
@@ -89,15 +91,15 @@ public class Inventory
             else if(PlayerInput.toLowerCase().equals("plecak") || PlayerInput.toLowerCase().equals("p") || PlayerInput.toLowerCase().equals("3"))
             {
                 String text = new String("");
+                OtherFunctions.clearScreen();
                 while(!PlayerInput.toLowerCase().equals("wyjscie") && !PlayerInput.toLowerCase().equals("w"))
                 {
-                    OtherFunctions.clearScreen();
                     System.out.println(text+"Posiadane przedmioty:");
                     if(!OtherItems.isEmpty())
                     {
                         for(int i=0;i<OtherItems.size();i++)
                         {
-                            System.out.println(OtherItems.get(i).ReturnName());
+                            System.out.println(OtherItems.get(i).ReturnName()+" - "+OtherItems.get(i).ReturnDescr());
                         }
                     }
                     else
@@ -105,14 +107,16 @@ public class Inventory
                         System.out.println("Brak posiadanych przedmiotów");
                     }
                     System.out.println("--------------------------------");
-                    System.out.println("Podaj nazwę przedmiotu aby zobaczyć go użyć lub zobaczyć jego opis (wpisz wyjscie aby wrócić )");
-                    PlayerInput = scan.nextLine();
-                    text = new String(ItemFunction(PlayerInput));
+                    System.out.println("Podaj nazwę przedmiotu aby go użyć (wpisz wyjscie aby wrócić)");
+                    PlayerInput = s.nextLine();
+                    //text = new String(ItemFunction(PlayerInput));
+                    Position = UseItem(PlayerInput,Player,Position);
                 }
             }
             //PlayerInput = s.nextLine(); 
         }
         OtherFunctions.clearScreen();
+        return Position;
         
     }
     public void SetCurrentWeapon(Weapons weapon)
@@ -136,11 +140,11 @@ public class Inventory
             }
         }
     }
-    public void AddItem(Weapons item)
+    public void AddItem(Items item)
     {
         OtherItems.add(item);
     }
-    public void AddItem(Items item)
+    public void RemoveItem(Items item)
     {
         OtherItems.remove(item);
     }
@@ -157,6 +161,40 @@ public class Inventory
             }
         }
         return t;
+    }
+    public Integer UseItem(String itemName,UnitStats PlayerStats, Integer Position)
+    {
+        for(int i=0;i<OtherItems.size();i++)
+        {
+            OtherFunctions.clearScreen();
+            if(OtherItems.get(i).ReturnName().toLowerCase().equals(itemName.toLowerCase()))
+            {
+                if(OtherItems.get(i).equals(ItemList.HPPotion))
+                {
+                    PlayerStats.ChangeHP(25);
+                    System.out.println("Wypito miksturę zdrowia i odzyskano 25 Punktów Zdrowia");
+                    OtherItems.remove(OtherItems.get(i));
+                }
+                else if(OtherItems.get(i).equals(ItemList.compass))
+                {
+                    ItemFunctions.CompassTarget(Position);
+                }
+                else if(OtherItems.get(i).equals(ItemList.Drink))
+                {
+                    Position = new Integer(ItemFunctions.Alcohol(Position));
+                    OtherItems.remove(OtherItems.get(i));
+                }
+                else if(OtherItems.get(i).equals(ItemList.Poison))
+                {
+                    PlayerStats.AddStatus(AllStatus.PoisonAttack);
+                    System.out.println("Twoja broń została posmarowana trucizną");
+                    OtherItems.remove(OtherItems.get(i));
+                }
+                System.out.println("---------------------");
+                i = OtherItems.size();
+            }
+        }
+        return Position;
     }
     public void AddArmor(Armor armor)
     {

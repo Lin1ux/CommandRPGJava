@@ -2,8 +2,8 @@ package ItemObjects;
 
 public class Armor extends Items 
 {
-    Integer armor;
-    Integer speed;
+    private Integer armor;
+    private Integer speed;
     public Armor(String Name,String Description,Integer armorValue,Integer speedValue)
     {
         SetName(Name);
@@ -27,13 +27,5 @@ public class Armor extends Items
     public Integer ReturnSpeed()
     {
         return speed;
-    }
-    public String ReturnName()
-    {
-        return name;
-    }
-    public Integer ReturnCost()
-    {
-        return Cost;
     }
 }

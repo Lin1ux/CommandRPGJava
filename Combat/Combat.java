@@ -7,9 +7,9 @@ import ProjectGame.OtherFunctions;
 
 public class Combat 
 {
-    String name;
-    String visual;
-    UnitStats EnemyStats;
+    private String name;
+    private String visual;
+    private UnitStats EnemyStats;
     
     public Combat(String newName,String newVisual,Integer newHP,Integer newDMG,Integer newMana,Integer newArmor,Integer newSpeed,Integer newGold)
     {
@@ -79,21 +79,32 @@ public class Combat
                             {
                                 Integer AttackValue = 0;
                                 Integer DefenceValue = 0;
-                                
+                                ArrayList<Status> newPlayerStatus = new ArrayList<Status>();    //Status nakładany przez gracza
+                                ArrayList<Status> newEnemyStatus = new ArrayList<Status>();     //Status nakładany przez przeciwnika
+
                                 PlayerStats.ChangeMana(-PlayerActions.get(x).ReturnCost());
                                 
                                 //Atak Gracza
                                 if(PlayerActions.get(x).equals(AllSkills.normalAttack)) //Zwykły atak
                                 {
                                     AttackValue = new Integer(PlayerStats.ReturnDMG());
+                                    newPlayerStatus = CombatCommands.AttackStatuses(PlayerStats.ReturnAllStatuses());
                                 }
                                 else if(PlayerActions.get(x).equals(AllSkills.lightAttack)) //Lekki atak
                                 {
                                     AttackValue = new Integer(( (int) Math.ceil((double) PlayerStats.ReturnDMG()/2)));
+                                    newPlayerStatus = CombatCommands.AttackStatuses(PlayerStats.ReturnAllStatuses());
                                 }
                                 else if(PlayerActions.get(x).equals(AllSkills.heavyAttack)) //Ciężki atak
                                 {
                                     AttackValue = new Integer(( (int) Math.ceil((double) PlayerStats.ReturnDMG()*1.5)));
+                                    newPlayerStatus = CombatCommands.AttackStatuses(PlayerStats.ReturnAllStatuses());
+                                }
+                                else if(PlayerActions.get(x).equals(AllSkills.StunAttack)) //Ogłuszający atak
+                                {
+                                    AttackValue = new Integer(( (int) Math.ceil((double) PlayerStats.ReturnDMG()/5)));
+                                    newPlayerStatus = CombatCommands.AttackStatuses(PlayerStats.ReturnAllStatuses());
+                                    AdditionalOMessage = EnemyStats.ReturnName()+" traci 2 Punkty Akcji";
                                 }
                                 //Obrona Przeciwnika
                                 //Losowanie akcji defensywnej przeciwnika
@@ -125,7 +136,11 @@ public class Combat
                                         {
                                             DefenceValue = EnemyStats.ReturnArmor();
                                         }
-                                        CombatCommands.Result(EnemyStats,AttackValue,DefenceValue,true,AdditionalOMessage,AdditionalDMessage);
+                                        CombatCommands.Result(EnemyStats,AttackValue,DefenceValue,true,AdditionalOMessage,AdditionalDMessage,newPlayerStatus,newEnemyStatus);
+                                        if(PlayerActions.get(x) == AllSkills.StunAttack)
+                                        {
+                                            EnemyStats.ChangeMana(-2);
+                                        }
                                         EnemyActions.remove(EnemyActions.get(y));
                                         DeffenceActionDone = true;
                                         //Sprawdzenie czy ktoś jest martwy
@@ -179,6 +194,23 @@ public class Combat
                 AdditionalOMessage = "";
                 AdditionalDMessage = "";
                 Boolean OffenceActionDone = false;
+                //Nakładanie statusów
+                for(int i=0;i<EnemyStats.AmountOfStatuses();i++)
+                {
+                    if(EnemyStats.ReturnStatusByIndex(i).ReturnName().equals(AllStatus.Poison.ReturnName()))
+                    {
+                        EnemyStats.ChangeHP(-3);
+                        System.out.println(EnemyStats.ReturnName()+" otrzymuje 3 obrażenia od trucizny");
+                    }
+                }
+                EnemyStats.ShortStatusDown(); //Zmniejszenie czasu trwania krótkich statusów
+                //Sprawdzenie czy statusy nie zabiły przeciwnika
+                if(EnemyStats.ReturnHP() <=0)
+                {
+                    OffenceActionDone = true;
+                    CombatWon = true;
+                    EndFight = true;
+                }
                 while(!OffenceActionDone)
                 {
                     //Losowanie akcji
@@ -216,6 +248,9 @@ public class Combat
                             //Atak Przeciwnika
                             Integer AttackValue = 0;
                             Integer DefenceValue = 0;
+
+                            ArrayList<Status> newEnemyStatus = new ArrayList<Status>();     //Status nakładany przez przeciwnika
+                            ArrayList<Status> newPlayerStatus = new ArrayList<Status>();    //Status nakładany przez gracza
                             
                             EnemyStats.ChangeMana(-EnemyActions.get(y).ReturnCost());        //Zmniejszenie punktów akcji
                             //Atak Przeciwnika
@@ -280,6 +315,12 @@ public class Combat
                                                         AdditionalDMessage = "Blok Zredukował 1 punkt akcji przeciwnika";
                                                     }
                                                 }
+                                                if(PlayerActions.get(x).equals(AllSkills.StunAttack)) 
+                                                {
+                                                    DefenceValue = PlayerStats.ReturnArmor();
+                                                    AdditionalDMessage = "Odzyskano 3 punkty akcji";
+                                                    PlayerStats.ChangeMana(5);
+                                                }
                                             }
                                             else
                                             {
@@ -310,7 +351,7 @@ public class Combat
                                     System.out.println("Nie znana komenda");
                                 }
                             }
-                            CombatCommands.Result(PlayerStats,AttackValue,DefenceValue,false,AdditionalOMessage,AdditionalDMessage);
+                            CombatCommands.Result(PlayerStats,AttackValue,DefenceValue,false,AdditionalOMessage,AdditionalDMessage,newEnemyStatus,newPlayerStatus);
                             EnemyActions.remove(EnemyActions.get(y));
                             //Sprawdzenie czy któryś z przeciwników jest martwy
                             if(PlayerStats.ReturnHP()<=0)

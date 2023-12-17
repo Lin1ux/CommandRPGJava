@@ -2,22 +2,25 @@ package Combat;
 
 import java.util.ArrayList;
 
+import javax.swing.text.StyledEditorKit.BoldAction;
+
 public class UnitStats 
 {
-    String Name;
-    Integer HP;
-    Integer MaxHP;
-    Integer DMG;
-    Integer DefaultDMG;
-    Integer Mana;
-    Integer MaxMana;
-    Integer Armor;
-    Integer DefaultArmor;
-    Integer Speed;
-    Integer DefaultSpeed;
-    Integer Gold;
+    private String Name;
+    private Integer HP;
+    private Integer MaxHP;
+    private Integer DMG;
+    private Integer DefaultDMG;
+    private Integer Mana;
+    private Integer MaxMana;
+    private Integer Armor;
+    private Integer DefaultArmor;
+    private Integer Speed;
+    private Integer DefaultSpeed;
+    private Integer Gold;
 
-    ArrayList<Skills> SkillsParam;
+    private ArrayList<Skills> SkillsParam;
+    private ArrayList<Status> CurrentStatuses;
     //Ustawianie wartości
     public void SetMaxHP(Integer newHP)
     {
@@ -66,6 +69,7 @@ public class UnitStats
     {
         DefaultSpeed = newSpeed;
     }
+    //Złoto
     public void SetGold(Integer newGold)
     {
         Gold = newGold;
@@ -136,6 +140,69 @@ public class UnitStats
     {
         return SkillsParam.get(x);
     }
+    //Status Postaci
+    public void AddStatus(Status newStatus)
+    {
+        Boolean StatusFound = false;
+        for(int i=0;i<CurrentStatuses.size();i++)
+        {
+            if(CurrentStatuses.get(i).ReturnName().equals(newStatus.ReturnName()))
+            {
+                StatusFound = true;
+                if(CurrentStatuses.get(i).ReturnDuration() < newStatus.ReturnDuration())
+                {
+                    //Przedłużenie czasu trwanie
+                    System.out.println("Add: "+newStatus.ReturnDuration());
+                    CurrentStatuses.get(i).SetDuration(newStatus.ReturnDuration()); 
+                }
+                else
+                {
+                    //Brak zmiany długości
+                    StatusFound = true;
+                }
+            }
+            if(StatusFound)
+            {
+                i = CurrentStatuses.size(); //Break
+            } 
+        }
+        if(!StatusFound)
+        {
+            CurrentStatuses.add(newStatus);
+        }
+    }
+    public void RemoveStatus(Status status)
+    {
+        CurrentStatuses.remove(status);
+    }
+    public void ShortStatusDown()
+    {
+        for(int i=0;i<CurrentStatuses.size();i++)
+        {
+            System.out.println(CurrentStatuses.get(i).ReturnName()+":"+CurrentStatuses.get(i).ReturnDuration()+" - "+AllStatus.Poison.ReturnDuration());
+            if(CurrentStatuses.get(i).ReturnType().equals(Status.ShortTime))
+            {   
+                CurrentStatuses.get(i).durationDown();  
+                if(CurrentStatuses.get(i).ReturnDuration() <= 0)
+                {    
+                    RemoveStatus(CurrentStatuses.get(i));
+                    i-=1;
+                }
+            }
+        }
+    }
+    public Integer AmountOfStatuses()
+    {
+        return CurrentStatuses.size();
+    }
+    public Status ReturnStatusByIndex(int x)
+    {
+        return CurrentStatuses.get(x);
+    }
+    public ArrayList<Status> ReturnAllStatuses()
+    {
+        return CurrentStatuses;
+    }
     //Zwracanie wartości
     public String ReturnName()
     {
@@ -205,9 +272,10 @@ public class UnitStats
         ResetSpeed();
         //Złoto
         SetGold(newGold);
-        SkillsParam = new ArrayList<>();
+        SkillsParam = new ArrayList<Skills>();
+        CurrentStatuses = new ArrayList<Status>();
     }
-    public UnitStats(String name,Integer newHP,Integer newDMG,Integer newMana,Integer newArmor,Integer newSpeed,Integer newGold,ArrayList<Skills> Skills)
+    public UnitStats(String name,Integer newHP,Integer newDMG,Integer newMana,Integer newArmor,Integer newSpeed,Integer newGold,ArrayList<Skills> Skills,ArrayList<Status> newStatus)
     {
         //Imie
         if(!name.equals(""))
@@ -236,6 +304,7 @@ public class UnitStats
         //Złoto
         SetGold(newGold);
         SkillsParam = Skills;
+        CurrentStatuses = newStatus;
     }
     public void PrintStats()
     {

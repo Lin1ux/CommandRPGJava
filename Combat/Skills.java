@@ -2,11 +2,11 @@ package Combat;
 
 public class Skills 
 {
-    String OffensiveName;
-    String DeffensiveName;
-    String ODescription;
-    String DDescription;
-    Integer Cost;
+    private String OffensiveName;
+    private String DeffensiveName;
+    private String ODescription;
+    private String DDescription;
+    private Integer Cost;
     public Skills(String OName, String DName, Integer NewCost,String ODescr, String DDescr)
     {
         this.OffensiveName = OName;

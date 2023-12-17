@@ -3,13 +3,10 @@ package ProjectGame;
 import java.util.Scanner;
 
 import Combat.UnitStats;
-import Combat.AllSkills;
 import Combat.Combat;
 import Combat.Units;
 
 import ItemObjects.Items;
-import ItemObjects.Weapons;
-import ItemObjects.Armor;
 import ItemObjects.ItemList;
 
 import java.util.ArrayList;
@@ -116,6 +113,20 @@ public class ActionManager
                     System.out.println("D) "+PlayerStats.ReturnSkillByIndex(i).ReturnName("D")+" - "+PlayerStats.ReturnSkillByIndex(i).ReturnDescr("D"));
                 }
                 System.out.println("---------------------");
+                System.out.println("Zdolności Pasywne");
+                if(PlayerStats.AmountOfStatuses()>0)
+                {
+                    for(int i=0;i<PlayerStats.AmountOfStatuses();i++)
+                    {
+                        System.out.println("---------------------");
+                        System.out.println(PlayerStats.ReturnStatusByIndex(i).ReturnName()+" - "+PlayerStats.ReturnStatusByIndex(i).ReturnDescr());
+                    }
+                }
+                else
+                {
+                    System.out.println("Brak");
+                }
+                System.out.println("---------------------");
                 System.out.println(World.get(CurrentPosition).ReturnCommandList());
                 System.out.println(GlobalCommands);
                 System.out.println("Co robisz?");
@@ -123,7 +134,7 @@ public class ActionManager
             else if(Action.toLowerCase().equals("ekwipunek") || Action.toLowerCase().equals("e"))
             {
                 //Ekwipunek
-                Inventory.InventoryMenu(s,PlayerStats);
+                ChangeCurrentPosition(Inventory.InventoryMenu(s,PlayerStats,CurrentPosition));
                 Action = "";
                 continue;
             }
@@ -157,6 +168,13 @@ public class ActionManager
                 Action = "";
                 continue;
             }
+            else if(Action.toLowerCase().equals("alchemik"))
+            {
+                World.get(CurrentPosition).Alchemists(s,PlayerStats);
+                OtherFunctions.clearScreen();
+                Action = "";
+                continue;
+            }
             else if(Action.toLowerCase().equals("karczma"))
             {
                 World.get(CurrentPosition).Tavern(s,PlayerStats);
@@ -180,42 +198,42 @@ public class ActionManager
             }
             else if(Action.toLowerCase().equals("drzwi") || Action.toLowerCase().equals("dr"))
             {
-                CurrentPosition = new Integer(World.get(CurrentPosition).Door());
+                ChangeCurrentPosition(new Integer(World.get(CurrentPosition).Door()));
                 Action = "";
                 OtherFunctions.clearScreen();
                 continue;
             }
             else if(Action.toLowerCase().equals("chatka") || Action.toLowerCase().equals("ch"))
             {
-                CurrentPosition = new Integer(World.get(CurrentPosition).House());
+                ChangeCurrentPosition(new Integer(World.get(CurrentPosition).House()));
                 Action = "";
                 OtherFunctions.clearScreen();
                 continue;
             }
             else if(Action.toLowerCase().equals("polnoc") || Action.toLowerCase().equals("w") || Action.toLowerCase().equals("pn"))
             {
-                CurrentPosition = new Integer(World.get(CurrentPosition).North());
+                ChangeCurrentPosition(new Integer(World.get(CurrentPosition).North()));
                 Action = "";
                 OtherFunctions.clearScreen();
                 continue;
             }
             else if(Action.toLowerCase().equals("poludnie") || Action.toLowerCase().equals("s") || Action.toLowerCase().equals("pd"))
             {
-                CurrentPosition = new Integer(World.get(CurrentPosition).South());
+                ChangeCurrentPosition(new Integer(World.get(CurrentPosition).South()));
                 Action = "";
                 OtherFunctions.clearScreen();
                 continue;
             }
             else if(Action.toLowerCase().equals("wschod") || Action.toLowerCase().equals("a") || Action.toLowerCase().equals("ws"))
             {
-                CurrentPosition = new Integer(World.get(CurrentPosition).East());
+                ChangeCurrentPosition(new Integer(World.get(CurrentPosition).East()));
                 Action = "";
                 OtherFunctions.clearScreen();
                 continue;
             }
             else if(Action.toLowerCase().equals("zachod") || Action.toLowerCase().equals("d") || Action.toLowerCase().equals("za"))
             {
-                CurrentPosition = new Integer(World.get(CurrentPosition).West());
+                ChangeCurrentPosition(new Integer(World.get(CurrentPosition).West()));
                 Action = "";
                 OtherFunctions.clearScreen();
                 continue;
@@ -248,4 +266,8 @@ public class ActionManager
         }
         s.close();
     }    
+    public void ChangeCurrentPosition(Integer newPos)
+    {
+        CurrentPosition = newPos;
+    }
 }

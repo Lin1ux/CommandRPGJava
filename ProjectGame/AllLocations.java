@@ -31,5 +31,4 @@ public class AllLocations
 
     public static Location TownLocation = new Location(Town,"Miasteczko Piachy",Visuals.EmptyVisual(),
     new ArrayList<String>(Arrays.asList(new String[]{"poludnie","wschod","zachod","karczma","kowal"})));
-
 }

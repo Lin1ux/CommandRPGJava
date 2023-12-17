@@ -2,9 +2,9 @@ package ItemObjects;
 
 public class Items 
 {
-    String name;
-    String Description;
-    Integer Cost;
+    private String name;
+    private String Description;
+    private Integer Cost;
     
     public String ShowDescription()
     {
@@ -26,14 +26,30 @@ public class Items
     {
         return name;
     }
+    public String ReturnDescr()
+    {
+        return Description;
+    }
+    public Integer ReturnCost()
+    {
+        return Cost;
+    }
     public Items(String name, String Description)
     {
         this.name = name;
         this.Description = Description;
+        this.Cost = 0;
+    }
+    public Items(String name, String Description,Integer newCost)
+    {
+        this.name = name;
+        this.Description = Description;
+        this.Cost = newCost;
     }
     public Items()
     {
         this.name = "";
         this.Description = "";
+        this.Cost = 0;
     }
 }

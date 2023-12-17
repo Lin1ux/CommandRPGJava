@@ -6,22 +6,22 @@ import java.util.Scanner;
 
 import Combat.AllSkills;
 import Combat.UnitStats;
-import ItemObjects.Weapons;
 import ItemObjects.Armor;
 import ItemObjects.ItemList;
+import ItemObjects.Items;
 
 
 public class Location 
 {
-    String locationName;
-    Integer locationId;
-    ArrayList<String> commandsList;
-    ArrayList<String> globalCommands;
-    String visual;
-    String lastText = "";
-    ArrayList<String> ProgressArray;
+    private String locationName;
+    private Integer locationId;
+    private ArrayList<String> commandsList;
+    private ArrayList<String> globalCommands;
+    private String visual;
+    private String lastText = "";
+    private ArrayList<String> ProgressArray;
 
-    Inventory inventory;
+    private Inventory inventory;
     public Location(Integer Id,String name, String visualisation,ArrayList<String> commands)
     {
         this.locationName = name;
@@ -186,6 +186,80 @@ public class Location
             return;
         }
     }
+    public void Alchemists(Scanner s,UnitStats PlayerStats)
+    {
+        if(commandsList.contains("alchemik"))
+        {
+            String PlayerInput = "";
+            while(!PlayerInput.toLowerCase().equals("wyjscie") && !PlayerInput.toLowerCase().equals("wy") && !PlayerInput.toLowerCase().equals("2"))
+            {
+                OtherFunctions.clearScreen();
+                System.out.println("Alchemik: Witaj w moim sklepie czy chcesz zobaczyć moje towary?");
+                QuickTexts.WhatToDoV(visual,new ArrayList<String>(Arrays.asList(new String[]{"sklep","wyjscie"})));
+                PlayerInput = s.nextLine();
+                if(PlayerInput.toLowerCase().equals("sklep") || PlayerInput.toLowerCase().equals("sk") || PlayerInput.toLowerCase().equals("1"))
+                {
+                    //Przedmioty do kupienia
+                    ArrayList<Items> ShopItems = new ArrayList<Items>();
+                    ShopItems.add(ItemList.HPPotion);
+                    ShopItems.add(ItemList.Drink);
+                    ShopItems.add(ItemList.Poison);
+                    PlayerInput = "";
+                    Boolean ItemBought = false; //czy kupiono przedmiot
+                    OtherFunctions.clearScreen();
+                    while(!ItemBought)
+                    {
+                        System.out.println("Dostępne towary (Posiadane złoto: "+PlayerStats.ReturnGold()+"):");
+                        for(int i=0;i<ShopItems.size();i++)
+                        {
+                            System.out.println((i+1)+") "+ShopItems.get(i).ReturnName()+" Koszt: "+ShopItems.get(i).ReturnCost());
+                        }
+                        System.out.println("4) Wyjście");
+                        System.out.println("Podaj wartość od 1-"+(ShopItems.size()+1)+":");
+                        PlayerInput = s.nextLine();
+                        try
+                        {
+                            //wybeiranie przedmiotów
+                            if(Integer.valueOf(PlayerInput) <= ShopItems.size()) //Czy komenda mieści się w zakresie
+                            {
+                                Integer x = Integer.valueOf(PlayerInput) - 1;
+                                if(ShopItems.get(x).ReturnCost() <= PlayerStats.ReturnGold())
+                                {
+                                    PlayerStats.ChangeGold(-ShopItems.get(x).ReturnCost());
+                                    inventory.AddItem(ShopItems.get(x));
+                                    OtherFunctions.clearScreen();
+                                    ItemBought = true;
+                                    PlayerInput = "wyjscie";
+                                }
+                                else
+                                {
+                                    OtherFunctions.clearScreen();
+                                    System.out.println("Posiadasz za mało złota");
+                                }
+                            }
+                            else if(Integer.valueOf(PlayerInput) <= ShopItems.size()+1)
+                            {
+                                OtherFunctions.clearScreen();
+                                ItemBought = true;
+                                PlayerInput = "wyjscie";
+                            }
+                            else
+                            {
+                                OtherFunctions.clearScreen();
+                                System.out.println("Nie znana komenda");
+                            }
+                        }
+                        catch(Exception e) //Dokończyć sklep 
+                        {
+                            OtherFunctions.clearScreen();
+                            System.out.println("Nie znana komenda"); 
+                        }
+
+                    }
+                }
+            }
+        }
+    }
     public void Armorer(Scanner s,UnitStats PlayerStats)
     {
         if(commandsList.contains("platnerz"))
@@ -215,7 +289,7 @@ public class Location
                             System.out.println((i+1)+") "+ShopItems.get(i).ReturnName()+" | Pancerz: "+ShopItems.get(i).ReturnArmor()+" | Szybkość: "+ShopItems.get(i).ReturnSpeed()+" | Koszt: "+ShopItems.get(i).ReturnCost());
                         }
                         System.out.println("4) Wyjście");
-                        System.out.println("Podaj wartość od 1-"+ShopItems.size()+":");
+                        System.out.println("Podaj wartość od 1-"+(ShopItems.size()+1)+":");
                         PlayerInput = s.nextLine();
                         try
                         {
@@ -255,7 +329,6 @@ public class Location
                             OtherFunctions.clearScreen();
                             System.out.println("Nie znana komenda"); 
                         }
-
                     }
                 }
             }

@@ -3,7 +3,7 @@ package ItemObjects;
 public class Weapons extends Items
 {
     //Items Texts;
-    Integer Damage;
+    private Integer Damage;
     public Weapons(String Name,String Description,Integer DMG)
     {
         //Texts = new Items
@@ -14,9 +14,5 @@ public class Weapons extends Items
     public Integer ReturnDamage()
     {
         return Damage;
-    }
-    public String ReturnName()
-    {
-        return name;
     }
 }

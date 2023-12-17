@@ -53,7 +53,8 @@ public class CombatCommands {
         }
         return min;
     }
-    public static void Result(UnitStats Deffender, Integer AttackValue, Integer DefenceValue,Boolean ResultForAttacker,String OMessage, String DMessage)
+    public static void Result(UnitStats Deffender, Integer AttackValue, Integer DefenceValue,
+    Boolean ResultForAttacker,String OMessage, String DMessage,ArrayList<Status> AttackerStatus,ArrayList<Status> DefenderStatus)
     {
         Integer Diffrence = DefenceValue - AttackValue;
         System.out.println("Obrona: "+DefenceValue+" vs Atak: "+AttackValue);
@@ -63,21 +64,31 @@ public class CombatCommands {
             if(ResultForAttacker)
             {
                 System.out.println("Atak zadał "+(-1*Diffrence)+" obrażeń");
+                for(int i=0;i<AttackerStatus.size();i++)
+                {
+                    Deffender.AddStatus(AttackerStatus.get(i)); //Dokończyć przedłużanie statusu
+                    System.out.println("Nałożono efekt: "+AttackerStatus.get(i).ReturnName());
+                }
             }
             else
             {
                 System.out.println("Otrzymano "+(-1*Diffrence)+" obrażeń");
+                for(int i=0;i<AttackerStatus.size();i++)
+                {
+                    Deffender.AddStatus(AttackerStatus.get(i));
+                    System.out.println("Otrzymano efekt: "+AttackerStatus.get(i).ReturnName());
+                }
             }
         }
         else
         {
             if(ResultForAttacker)
             {
-                System.out.println("Atak zakończył się niepowedzeniem");
+                System.out.println("Atak zadał żadnych obrażeń");
             }
             else
             {
-                System.out.println("Obrona zakończyła się powodzeniem");
+                System.out.println("Atak przeciwnika nie zadaje tobie obrażeń");
             }
         }
         if(!DMessage.equals(""))
@@ -88,6 +99,18 @@ public class CombatCommands {
         {
             System.out.println(OMessage);
         }
+    }
+    public static ArrayList<Status> AttackStatuses(ArrayList<Status> AttackerStatuses)
+    {
+        ArrayList<Status> newStatuses = new ArrayList<Status>();
+        for(int i=0;i<AttackerStatuses.size();i++)
+        {
+            if(AttackerStatuses.get(i).equals(AllStatus.PoisonAttack)) //Trujący cios
+            {
+                newStatuses.add(new Status(AllStatus.Poison));
+            }
+        }
+        return newStatuses;
     }
     public static void CombatWindow(UnitStats PlayerStats,UnitStats EnemyStats, String Visuals)
     {
