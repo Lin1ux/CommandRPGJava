@@ -41,17 +41,27 @@ public class ActionManager
         this.CurrentPosition = new Integer(AllLocations.House);
         ArrayList<Location> World = new ArrayList<Location>();
 
-        World.add(AllLocations.SwordLocation);                   //0
-        World.add(AllLocations.SmallHouseLocation);              //1
-        World.add(AllLocations.RoadLocation);                    //2
-        World.add(AllLocations.VillageLocation);                 //3
-        World.add(AllLocations.CartLocation);                    //4
-        World.add(AllLocations.TownLocation);                    //5
+        World.add(AllLocations.SwordLocation);                   
+        World.add(AllLocations.SmallHouseLocation);              
+        World.add(AllLocations.RoadLocation);                    
+        World.add(AllLocations.VillageLocation);                 
+        World.add(AllLocations.CartLocation);                    
+        World.add(AllLocations.TownLocation);                    
+        World.add(AllLocations.LakeLocation);   
+        World.add(AllLocations.CaveLocation);   
+        World.add(AllLocations.CaveQuestLocation);              
+        World.add(AllLocations.LastRoomLocation); 
 
         //Przeciwnicy
-        UnitStats Enemy = Units.Gramlin;
+        UnitStats Enemy1 = Units.Gramlin;
+        UnitStats Enemy2 = Units.Raptor;
+        UnitStats Enemy3 = Units.BloodThister;
+        UnitStats Enemy4 = Units.Golem;
         //Walki
-        Combat Gremlin = new Combat( "Zgred",Visuals.GramlinVisual(),Enemy);
+        Combat Gremlin = new Combat( "Zgred",Visuals.GramlinVisual(),Enemy1);
+        Combat Raptor = new Combat( "Raptor",Visuals.RaptorVisual(),Enemy2);
+        Combat BloodThister = new Combat( "Krwiopijec",Visuals.GramlinVisual(),Enemy3);
+        Combat Golem = new Combat( "Golem",Visuals.GramlinVisual(),Enemy4);
 
         while(!GameOver)
         {
@@ -88,7 +98,15 @@ public class ActionManager
             else if(CurrentPosition == AllLocations.Cart)
             {
                 World.get(CurrentPosition).SetGlobalCommands(GlobalCommands);
-                World.get(CurrentPosition).Description("Przed tobą zauważasz się przewrócony wóz oraz Raptora atakującego jego właścicieli");
+                if(World.get(CurrentPosition).ReturnCommandList().contains("walka"))
+                {    
+                    World.get(CurrentPosition).Description("Przed tobą zauważasz przewrócony wóz oraz Raptora atakującego jego właścicieli");
+                }
+                else
+                {
+                    World.get(CurrentPosition).SetVisual(Visuals.CartVisual());
+                    World.get(CurrentPosition).Description("Na drodze znajduje się zniszczony wóz");
+                }
             }
             //Komendy gracza
             if(Action.toLowerCase().equals("statystyki") || Action.toLowerCase().equals("st"))
@@ -108,9 +126,9 @@ public class ActionManager
                 for(int i=0;i<PlayerStats.AmountOfSkills();i++)
                 {
                     System.out.println("---------------------");
-                    System.out.println("Koszt: "+PlayerStats.ReturnSkillByIndex(i).ReturnCost());
                     System.out.println("O) "+PlayerStats.ReturnSkillByIndex(i).ReturnName("O")+" - "+PlayerStats.ReturnSkillByIndex(i).ReturnDescr("O"));
                     System.out.println("D) "+PlayerStats.ReturnSkillByIndex(i).ReturnName("D")+" - "+PlayerStats.ReturnSkillByIndex(i).ReturnDescr("D"));
+                    System.out.println("Koszt: "+PlayerStats.ReturnSkillByIndex(i).ReturnCost());
                 }
                 System.out.println("---------------------");
                 System.out.println("Zdolności Pasywne");
@@ -147,12 +165,33 @@ public class ActionManager
             {
                 if(World.get(CurrentPosition).ReturnCommandList().contains("walka"))
                 {
-                    if(CurrentPosition == 2)
+                    if(CurrentPosition == AllLocations.Road)
                     {
                         CombatWon = Gremlin.CombatScript(s,PlayerStats);
                         World.get(CurrentPosition).CommandManager("remove","walka");
                         World.get(CurrentPosition).CommandManager("add","wschod");
                     }
+                    else if(CurrentPosition == AllLocations.Cart)
+                    {
+                        CombatWon = Raptor.CombatScript(s,PlayerStats);
+                        World.get(CurrentPosition).CommandManager("remove","walka");
+                        World.get(CurrentPosition).CommandManager("add","polnoc");
+                    }
+                    else if(CurrentPosition == AllLocations.Lake)
+                    {
+                        CombatWon = BloodThister.CombatScript(s,PlayerStats);
+                        World.get(CurrentPosition).CommandManager("remove","walka");
+                    }
+                    else if(CurrentPosition == AllLocations.LastRoom)
+                    {
+                        CombatWon = Golem.CombatScript(s,PlayerStats);
+                        World.get(CurrentPosition).CommandManager("remove","walka");
+                        World.get(CurrentPosition).CommandManager("add","artefakt");
+                    }
+                }
+                else
+                {
+                    OtherFunctions.clearScreen(); 
                 }
                 Action = "";
                 continue;
@@ -185,7 +224,7 @@ public class ActionManager
             else if(Action.toLowerCase().equals("postac"))
             {   
                 OtherFunctions.clearScreen();
-                World.get(CurrentPosition).Armadillo(PlayerStats);
+                World.get(CurrentPosition).Armadillo(s,PlayerStats);
                 if(World.get(CurrentPosition).ReturnId() == 1)
                 {
                     World.get(0).CommandManager("Add", "odpoczynek");
@@ -194,7 +233,7 @@ public class ActionManager
             else if(Action.toLowerCase().equals("trening"))
             {   
                 OtherFunctions.clearScreen();
-                World.get(CurrentPosition).Armadillo(PlayerStats);
+                World.get(CurrentPosition).Armadillo(s,PlayerStats);
             }
             else if(Action.toLowerCase().equals("drzwi") || Action.toLowerCase().equals("dr"))
             {

@@ -46,7 +46,7 @@ public class Location
         System.out.println(globalCommands);
         System.out.println("Co robisz? (podaj komendę)");
     }
-    public void Armadillo(UnitStats Player)
+    public void Armadillo(Scanner s,UnitStats Player)
     {
         if(commandsList.contains("postac"))
         {
@@ -69,9 +69,40 @@ public class Location
                     Description("Jarosław: Wyjmij miecz, który był w mojej chatce i zaczynajmy trening\n(Możesz założyć miecz za pomocą komendy |ekwipunek|).");
                 }
             }
-            else if(!ProgressArray.contains("FirstTrainDone"))
+            else if(ProgressArray.contains("FirstTrainDone") && !inventory.ReturnItems().contains(ItemList.Drink))
             {
                 Description("Jarosław: Mógłbyś coś dla mnie zrobić? Przynieś mi napój Panceriańśka. Z tego co pamiętam możesz go kupić u alchemika z wschodniej wioski.");
+            }
+            else if(ProgressArray.contains("FirstTrainDone") && inventory.ReturnItems().contains(ItemList.Drink))
+            {   
+                String PlayerAction = "";
+                Boolean AnswerDone = false;
+                while(!AnswerDone)
+                {
+                    OtherFunctions.clearScreen();
+                    System.out.println("Jarosław: Wróciłeś! Czy przyniosłeś mój napój?");
+                    QuickTexts.WhatToDoV(visual,new ArrayList<String>(Arrays.asList(new String[]{"daj","nie"})));
+                    PlayerAction = s.nextLine();
+                    if(PlayerAction.toLowerCase().equals("daj") || PlayerAction.equals("1"))
+                    {
+                        OtherFunctions.clearScreen();
+                        Description("Jarosław: Dziękować! Przejdźmy do treningu\n"+"Przechodzisz szkolenie i uczysz się zdolności [ "+AllSkills.counterAttack.ReturnName("O")+" | "+AllSkills.counterAttack.ReturnName("D")+" ]");
+                        Player.AddSkill(AllSkills.counterAttack);
+                        ProgressArray.add("SecondTrainDone");
+                        inventory.RemoveItem(ItemList.Drink);
+                        AnswerDone = true;
+                    }
+                    else if(PlayerAction.toLowerCase().equals("nie") || PlayerAction.equals("2"))
+                    {
+                        OtherFunctions.clearScreen();
+                        Description("Jarosław: Wielka szkoda");
+                        AnswerDone = true;
+                    }
+                }
+            }
+            else if(ProgressArray.contains("SecondTrainDone"))
+            {
+                Description("Jarosław: Ukończyłeś wszystkie moje szkolenia.");
             }
         }
     }

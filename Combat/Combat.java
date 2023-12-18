@@ -108,8 +108,8 @@ public class Combat
                                 }
                                 //Obrona Przeciwnika
                                 //Losowanie akcji defensywnej przeciwnika
-                                Boolean DeffenceActionDone = false;
-                                while(!DeffenceActionDone)
+                                Boolean DefenceActionDone = false;
+                                while(!DefenceActionDone)
                                 {
                                     Integer y = OtherFunctions.RandInt(0,EnemyActions.size());
                                     if(EnemyActions.get(y).ReturnCost() <= EnemyStats.ReturnMana())
@@ -120,7 +120,7 @@ public class Combat
                                         {
                                             DefenceValue = EnemyStats.ReturnDMG() + EnemyStats.ReturnArmor();
                                         }
-                                        if(EnemyActions.get(y).equals(AllSkills.lightAttack)) //Lekki atak
+                                        if(EnemyActions.get(y).equals(AllSkills.lightAttack) || EnemyActions.get(y).equals(AllSkills.biteAttack)) //Lekki atak
                                         {
                                             Integer Chance = OtherFunctions.RandInt(0,20);
                                             if(Chance < 10+EnemyStats.ReturnSpeed()-PlayerStats.ReturnSpeed() && !PlayerActions.get(x).equals(AllSkills.lightAttack))
@@ -136,13 +136,18 @@ public class Combat
                                         {
                                             DefenceValue = EnemyStats.ReturnArmor();
                                         }
+                                        else if(EnemyActions.get(y).equals(AllSkills.biteAttack))
+                                        {
+                                            DefenceValue = EnemyStats.ReturnArmor();
+                                            EnemyStats.ChangeMana(EnemyActions.get(y).ReturnCost());    //Odnowienie kosztu
+                                        }
                                         CombatCommands.Result(EnemyStats,AttackValue,DefenceValue,true,AdditionalOMessage,AdditionalDMessage,newPlayerStatus,newEnemyStatus);
                                         if(PlayerActions.get(x) == AllSkills.StunAttack)
                                         {
                                             EnemyStats.ChangeMana(-2);
                                         }
                                         EnemyActions.remove(EnemyActions.get(y));
-                                        DeffenceActionDone = true;
+                                        DefenceActionDone = true;
                                         //Sprawdzenie czy ktoś jest martwy
                                         if(PlayerStats.ReturnHP()<=0)
                                         {
@@ -237,7 +242,7 @@ public class Combat
                         OffenceActionDone = true;
                         PlayerAttack = true;
 
-                        OtherFunctions.clearScreen();
+                        //OtherFunctions.clearScreen();
                         System.out.println(name+": Kończy turę");
                     }
                     else
@@ -257,14 +262,27 @@ public class Combat
                             if(EnemyActions.get(y).equals(AllSkills.normalAttack)) //Zwykły atak
                             {
                                 AttackValue = new Integer(EnemyStats.ReturnDMG());
+                                newEnemyStatus = CombatCommands.AttackStatuses(EnemyStats.ReturnAllStatuses());
                             }
                             else if(EnemyActions.get(y).equals(AllSkills.lightAttack)) //Lekki atak
                             {
                                 AttackValue = new Integer(( (int) Math.ceil((double) EnemyStats.ReturnDMG()/2)));
+                                newEnemyStatus = CombatCommands.AttackStatuses(EnemyStats.ReturnAllStatuses());
                             }
                             else if(EnemyActions.get(y).equals(AllSkills.heavyAttack)) //Ciężki atak
                             {
                                 AttackValue = new Integer(( (int) Math.ceil((double) EnemyStats.ReturnDMG()*1.5)));
+                                newEnemyStatus = CombatCommands.AttackStatuses(EnemyStats.ReturnAllStatuses());
+                            }
+                            else if(EnemyActions.get(y).equals(AllSkills.biteAttack)) //Ugryzienie
+                            {
+                                AttackValue = new Integer(( (int) Math.ceil((double) EnemyStats.ReturnDMG()/2)));
+                                newEnemyStatus = CombatCommands.AttackStatuses(EnemyStats.ReturnAllStatuses());
+                            }
+                            else if(EnemyActions.get(y).equals(AllSkills.jumpAttack)) //Doskok
+                            {
+                                AttackValue = new Integer(EnemyStats.ReturnDMG());
+                                newEnemyStatus = CombatCommands.AttackStatuses(EnemyStats.ReturnAllStatuses());
                             }
                             //Akcja Defensywna gracza
                             Boolean PlayerActionDone = false;
@@ -352,6 +370,16 @@ public class Combat
                                 }
                             }
                             CombatCommands.Result(PlayerStats,AttackValue,DefenceValue,false,AdditionalOMessage,AdditionalDMessage,newEnemyStatus,newPlayerStatus);
+                            if(EnemyActions.get(y).equals(AllSkills.biteAttack) && AttackValue < DefenceValue)    //Odnowienie PA
+                            {
+                                EnemyStats.ChangeMana(2);
+                                System.out.println(EnemyStats.ReturnName()+" Odzyskuje 2 punkty akcji");
+                            }
+                            if(EnemyActions.get(y).equals(AllSkills.jumpAttack) && AttackValue > DefenceValue)    //Odnowienie PA
+                            {
+                                PlayerStats.ChangeMana(-1);
+                                System.out.println("Tracisz 2 punkty akcji");
+                            }
                             EnemyActions.remove(EnemyActions.get(y));
                             //Sprawdzenie czy któryś z przeciwników jest martwy
                             if(PlayerStats.ReturnHP()<=0)

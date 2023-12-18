@@ -43,13 +43,14 @@ public class Inventory
             if(PlayerInput.toLowerCase().equals("bron") || PlayerInput.toLowerCase().equals("b") || PlayerInput.toLowerCase().equals("1"))
             {
                 OtherFunctions.clearScreen();
-                System.out.println("|Używana broń:     |"+CurrentWeapon.ReturnName()+"| Obrażenia: "+CurrentWeapon.ReturnDamage().toString());
+                System.out.println("|Używana broń:     |"+CurrentWeapon.ReturnName()+" | Obrażenia: "+CurrentWeapon.ReturnDamage().toString());
                 System.out.println("Posiadane bronie:");
+                //System.out.println(Integer.valueOf("df"));
                 if(!Weapons.isEmpty())
                 {
                     for(int i=0;i<Weapons.size();i++)
                     {
-                        System.out.println(Weapons.get(i).ReturnName()+"| Obrażenia "+Weapons.get(i).ReturnDamage());
+                        System.out.println((i+1)+") "+Weapons.get(i).ReturnName()+"| Obrażenia "+Weapons.get(i).ReturnDamage());
                     }
                 }
                 else
@@ -57,7 +58,7 @@ public class Inventory
                     System.out.println("Brak dostępnych broni");
                 }
                 System.out.println("--------------------------------");
-                System.out.println("Podaj nazwę broni aby ją założyć");
+                System.out.println("Podaj numer broni");
                 PlayerInput = s.nextLine();
                 ChangeWeapon(PlayerInput);
                 Player.SetDefaultDMG(ReturnWeaponsDamage());
@@ -66,13 +67,13 @@ public class Inventory
             else if(PlayerInput.toLowerCase().equals("zbroja") || PlayerInput.toLowerCase().equals("z") || PlayerInput.toLowerCase().equals("2"))
             {
                 OtherFunctions.clearScreen();
-                System.out.println("|Używana zbroja:     | "+CurrentArmor.ReturnName()+"| Pancerz: "+CurrentArmor.ReturnArmor()+" | Szybkość: "+CurrentArmor.ReturnSpeed());
+                System.out.println("|Używana zbroja:     | "+CurrentArmor.ReturnName()+" | Pancerz: "+CurrentArmor.ReturnArmor()+" | Szybkość: "+CurrentArmor.ReturnSpeed());
                 System.out.println("Posiadane zbroje:");
                 if(!Armors.isEmpty())
                 {
                     for(int i=0;i<Armors.size();i++)
                     {
-                        System.out.println(Armors.get(i).ReturnName()+"| Pancerz "+Armors.get(i).ReturnArmor()+" | Szybkość: "+Armors.get(i).ReturnSpeed());
+                        System.out.println((i+1)+") "+Armors.get(i).ReturnName()+"| Pancerz "+Armors.get(i).ReturnArmor()+" | Szybkość: "+Armors.get(i).ReturnSpeed());
                     }
                 }
                 else
@@ -80,7 +81,7 @@ public class Inventory
                     System.out.println("Brak dostępnych zbroi");
                 }
                 System.out.println("--------------------------------");
-                System.out.println("Podaj nazwę zbroi aby ją założyć");
+                System.out.println("Podaj numer zbroi");
                 PlayerInput = s.nextLine();
                 ChangeArmor(PlayerInput);
                 Player.SetDefaultArmor(ReturnArmorsValue());
@@ -129,15 +130,17 @@ public class Inventory
     }
     public void ChangeWeapon(String weaponName)
     {
-        for(int i=0;i<Weapons.size();i++)
+        try 
         {
-            if(weaponName.toLowerCase().equals(Weapons.get(i).ReturnName().toLowerCase()));
-            {
-                AddWeapon(CurrentWeapon);
-                SetCurrentWeapon(Weapons.get(i));
-                Weapons.remove(i);
-                i=Weapons.size();
-            }
+            Integer i = Integer.valueOf(weaponName)-1;
+            AddWeapon(CurrentWeapon);
+            SetCurrentWeapon(Weapons.get(i));
+            Weapons.remove(Weapons.get(i));
+            i=Weapons.size();
+        } 
+        catch (Exception e) 
+        {
+            
         }
     }
     public void AddItem(Items item)
@@ -206,6 +209,18 @@ public class Inventory
     }
     public void ChangeArmor(String armorName)
     {
+        try 
+        {
+            Integer i = Integer.valueOf(armorName)-1;
+            SetCurrentArmor(Armors.get(i));
+            AddArmor(CurrentArmor);
+            Armors.remove(Armors.get(i));
+            i=Armors.size();
+        } 
+        catch (Exception e) 
+        {
+            
+        }
         for(int i=0;i<Armors.size();i++)
         {
             if(armorName.toLowerCase().equals(Armors.get(i).ReturnName().toLowerCase()));
@@ -232,5 +247,9 @@ public class Inventory
     public Integer ReturnArmorsSpeed()
     {
         return CurrentArmor.ReturnSpeed();
+    }
+    public ArrayList<Items> ReturnItems()
+    {
+        return OtherItems;
     }
 }
