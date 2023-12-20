@@ -58,11 +58,34 @@ public class Combat
         OtherFunctions.clearScreen();
         while(!EndFight)
         {
-            CombatCommands.CombatWindow(PlayerStats, EnemyStats, visual);
             if(PlayerAttack)    //Atak Gracza
             {
+                //Statusy
                 AdditionalOMessage = "";
                 AdditionalDMessage = "";
+                //Nakładanie statusów
+                for(int i=0;i<PlayerStats.AmountOfStatuses();i++)
+                {
+                    if(PlayerStats.ReturnStatusByIndex(i).ReturnName().equals(AllStatus.Poison.ReturnName()))
+                    {
+                        PlayerStats.ChangeHP(-3);
+                        System.out.println("Otrzymujesz 3 obrażenia od trucizny");
+                    }
+                    else if(PlayerStats.ReturnStatusByIndex(i).ReturnName().equals(AllStatus.Bleed.ReturnName()))
+                    {
+                        PlayerStats.ChangeHP(-2);
+                        System.out.println("Otrzymujesz 2 obrażenia od krwawienia");
+                    }
+                }
+                PlayerStats.ShortStatusDown(); //Zmniejszenie czasu trwania krótkich statusów
+                //Sprawdzenie czy statusy nie zabiły gracza
+                if(EnemyStats.ReturnHP() <=0) 
+                {
+                    CombatWon = false;
+                    EndFight = true;
+                    continue;
+                }
+                CombatCommands.CombatWindow(PlayerStats, EnemyStats, visual);
                 System.out.println("Dostępne akcje (Ofensywa)");
                 System.out.println(CombatCommands.AllSkillInfo(PlayerActions));
                 System.out.println("Podaj numer akcji (1-"+PlayerActions.size()+")");
@@ -106,21 +129,73 @@ public class Combat
                                     newPlayerStatus = CombatCommands.AttackStatuses(PlayerStats.ReturnAllStatuses());
                                     AdditionalOMessage = EnemyStats.ReturnName()+" traci 2 Punkty Akcji";
                                 }
+                                else if(PlayerActions.get(x).equals(AllSkills.counterAttack)) //krwawiacy atak
+                                {
+                                    AttackValue = new Integer(PlayerStats.ReturnDMG());
+                                    newPlayerStatus = CombatCommands.AttackStatuses(PlayerStats.ReturnAllStatuses());
+                                    newPlayerStatus.add(AllStatus.Bleed);
+                                }
+                                else if(PlayerActions.get(x).equals(AllSkills.Heal))
+                                {
+                                    AttackValue = 10;
+                                }
                                 //Obrona Przeciwnika
                                 //Losowanie akcji defensywnej przeciwnika
                                 Boolean DefenceActionDone = false;
                                 while(!DefenceActionDone)
                                 {
-                                    Integer y = OtherFunctions.RandInt(0,EnemyActions.size());
+                                    Integer y = 0;
+                                    if(PlayerActions.get(x).equals(AllSkills.Heal))
+                                    {
+                                        for(int i=0;i<EnemyActions.size();i++)
+                                        {
+                                            if(EnemyActions.get(i).equals(AllSkills.Wait))
+                                            {
+                                                y = i;
+                                                i = EnemyActions.size();
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        y = OtherFunctions.RandInt(0,EnemyActions.size());
+                                    }
                                     if(EnemyActions.get(y).ReturnCost() <= EnemyStats.ReturnMana())
                                     {
                                         System.out.println(PlayerActions.get(x).ReturnName("O")+" vs "+EnemyActions.get(y).ReturnName("D"));
                                         EnemyStats.ChangeMana(-EnemyActions.get(y).ReturnCost());
-                                        if(EnemyActions.get(y).equals(AllSkills.normalAttack)) //Zwykły atak
+                                        if(EnemyActions.get(y).equals(AllSkills.normalAttack)) //Zwykły blok
                                         {
-                                            DefenceValue = EnemyStats.ReturnDMG() + EnemyStats.ReturnArmor();
+                                            DefenceValue = EnemyStats.ReturnDMG();
+                                            if(!PlayerStats.ReturnAllStatuses().contains(AllStatus.PenetrationAttack))
+                                            {
+                                                DefenceValue += EnemyStats.ReturnArmor();
+                                            }
+                                            else
+                                            {
+                                                DefenceValue += ( (int) Math.ceil((double) EnemyStats.ReturnArmor()/2));
+                                            }
                                         }
-                                        if(EnemyActions.get(y).equals(AllSkills.lightAttack) || EnemyActions.get(y).equals(AllSkills.biteAttack)) //Lekki atak
+                                        else if(EnemyActions.get(y).equals(AllSkills.heavyAttack)) //Ciężki blok
+                                        {
+                                            DefenceValue = EnemyStats.ReturnDMG();
+                                            if(!PlayerStats.ReturnAllStatuses().contains(AllStatus.PenetrationAttack))
+                                            {
+                                                DefenceValue += EnemyStats.ReturnArmor();
+                                            }
+                                            else
+                                            {
+                                                DefenceValue += ( (int) Math.ceil((double) EnemyStats.ReturnArmor()/2));
+                                            }
+                                            //Redukcja punktu Akcji 
+                                            Integer Chance = OtherFunctions.RandInt(0,20);
+                                            if(Chance < 10)
+                                            {
+                                                PlayerStats.ChangeMana(-1);
+                                                AdditionalDMessage = "Blok przeciwnika zredukował 1 punkt akcji";
+                                            }
+                                        }
+                                        else if(EnemyActions.get(y).equals(AllSkills.lightAttack) || EnemyActions.get(y).equals(AllSkills.biteAttack)) //Lekki atak
                                         {
                                             Integer Chance = OtherFunctions.RandInt(0,20);
                                             if(Chance < 10+EnemyStats.ReturnSpeed()-PlayerStats.ReturnSpeed() && !PlayerActions.get(x).equals(AllSkills.lightAttack))
@@ -129,22 +204,70 @@ public class Combat
                                             }
                                             else
                                             {
-                                                DefenceValue = EnemyStats.ReturnArmor();
+                                                if(!PlayerStats.ReturnAllStatuses().contains(AllStatus.PenetrationAttack))
+                                                {
+                                                    DefenceValue = EnemyStats.ReturnArmor();
+                                                }
+                                                else
+                                                {
+                                                    DefenceValue = new Integer (( (int) Math.ceil((double) EnemyStats.ReturnArmor()/2)));
+                                                }
                                             }
+                                        }
+                                        else if(EnemyActions.get(x).equals(AllSkills.counterAttack))
+                                        {
+                                            DefenceValue = EnemyStats.ReturnArmor();
+                                            newEnemyStatus.add(AllStatus.CounterAttack);
                                         }
                                         else if(EnemyActions.get(y).equals(AllSkills.Wait))
                                         {
-                                            DefenceValue = EnemyStats.ReturnArmor();
+                                            if(!PlayerStats.ReturnAllStatuses().contains(AllStatus.PenetrationAttack))
+                                            {
+                                                DefenceValue = EnemyStats.ReturnArmor();
+                                            }
+                                            else
+                                            {
+                                                DefenceValue = new Integer (( (int) Math.ceil((double) EnemyStats.ReturnArmor()/2)));
+                                            }
                                         }
                                         else if(EnemyActions.get(y).equals(AllSkills.biteAttack))
                                         {
-                                            DefenceValue = EnemyStats.ReturnArmor();
+                                            if(!PlayerStats.ReturnAllStatuses().contains(AllStatus.PenetrationAttack))
+                                            {
+                                                DefenceValue = EnemyStats.ReturnArmor();
+                                            }
+                                            else
+                                            {
+                                                DefenceValue = new Integer (( (int) Math.ceil((double) EnemyStats.ReturnArmor()/2)));
+                                            }
                                             EnemyStats.ChangeMana(EnemyActions.get(y).ReturnCost());    //Odnowienie kosztu
                                         }
-                                        CombatCommands.Result(EnemyStats,AttackValue,DefenceValue,true,AdditionalOMessage,AdditionalDMessage,newPlayerStatus,newEnemyStatus);
+                                        if(PlayerActions.get(x).equals(AllSkills.Heal))
+                                        {
+                                            PlayerStats.ChangeHP(AttackValue);
+                                            System.out.println("Uleczono "+AttackValue+" PZ");
+                                        }
+                                        else
+                                        {
+                                            CombatCommands.Result(EnemyStats,PlayerStats,AttackValue,DefenceValue,true,AdditionalOMessage,AdditionalDMessage,newPlayerStatus,newEnemyStatus);
+                                        }
                                         if(PlayerActions.get(x) == AllSkills.StunAttack)
                                         {
                                             EnemyStats.ChangeMana(-2);
+                                        }
+                                        //Dokończyć
+                                        if(PlayerStats.ReturnAllStatuses().contains(AllStatus.CounterAttack))        //Kontraatak
+                                        {
+                                            System.out.println("--- "+EnemyStats.ReturnName()+" Wykonuje Kontraatak ---");
+                                            DefenceValue = PlayerStats.ReturnArmor();
+                                            AttackValue = new Integer(( (int) Math.ceil((double) EnemyStats.ReturnDMG()/2)));
+                                            CombatCommands.Result(PlayerStats,EnemyStats,AttackValue,DefenceValue,true,"","",new ArrayList<Status>(),new ArrayList<Status>());
+                                            PlayerStats.RemoveStatus(AllStatus.CounterAttack);
+                                        }
+                                        if(EnemyStats.ReturnAllStatuses().contains(AllStatus.Thorns) && AttackValue > DefenceValue && PlayerActions.get(x).equals(AllSkills.Heal))           //Ciernie
+                                        {
+                                            PlayerStats.ChangeHP(-1);
+                                            System.out.println("Kolczasta zbroja zadaje tobie obrażenia równe 1");
                                         }
                                         EnemyActions.remove(EnemyActions.get(y));
                                         DefenceActionDone = true;
@@ -180,16 +303,19 @@ public class Combat
                         }
                         else
                         {
+                            OtherFunctions.clearScreen();
                             System.out.println("Nie posiadasz wystarczającej liczby punktów akcji");
                         }
                     }
                     else
                     {
+                        OtherFunctions.clearScreen();
                         System.out.println("Nie znana komenda.");
                     }
                 }
                 else
                 {
+                    OtherFunctions.clearScreen();
                     System.out.println("Nie znana komenda.");
                 }
             }
@@ -206,6 +332,16 @@ public class Combat
                     {
                         EnemyStats.ChangeHP(-3);
                         System.out.println(EnemyStats.ReturnName()+" otrzymuje 3 obrażenia od trucizny");
+                    }
+                    else if(EnemyStats.ReturnStatusByIndex(i).ReturnName().equals(AllStatus.Bleed.ReturnName()))
+                    {
+                        EnemyStats.ChangeHP(-2);
+                        System.out.println(EnemyStats.ReturnName()+" otrzymuje 2 obrażenia od krwawienia");
+                    }
+                    else if(EnemyStats.ReturnStatusByIndex(i).ReturnName().equals(AllStatus.Stun.ReturnName()))
+                    {
+                        EnemyStats.ChangeMana(-1);
+                        System.out.println(EnemyStats.ReturnName()+" jest oszołomiony i traci 1 punkt akcji");
                     }
                 }
                 EnemyStats.ShortStatusDown(); //Zmniejszenie czasu trwania krótkich statusów
@@ -257,9 +393,9 @@ public class Combat
                             ArrayList<Status> newEnemyStatus = new ArrayList<Status>();     //Status nakładany przez przeciwnika
                             ArrayList<Status> newPlayerStatus = new ArrayList<Status>();    //Status nakładany przez gracza
                             
-                            EnemyStats.ChangeMana(-EnemyActions.get(y).ReturnCost());        //Zmniejszenie punktów akcji
+                            EnemyStats.ChangeMana(-EnemyActions.get(y).ReturnCost());       //Zmniejszenie punktów akcji
                             //Atak Przeciwnika
-                            if(EnemyActions.get(y).equals(AllSkills.normalAttack)) //Zwykły atak
+                            if(EnemyActions.get(y).equals(AllSkills.normalAttack))          //Zwykły atak
                             {
                                 AttackValue = new Integer(EnemyStats.ReturnDMG());
                                 newEnemyStatus = CombatCommands.AttackStatuses(EnemyStats.ReturnAllStatuses());
@@ -284,6 +420,13 @@ public class Combat
                                 AttackValue = new Integer(EnemyStats.ReturnDMG());
                                 newEnemyStatus = CombatCommands.AttackStatuses(EnemyStats.ReturnAllStatuses());
                             }
+                            else if(EnemyActions.get(y).equals(AllSkills.counterAttack)) //kontraatak
+                            {
+                                AttackValue = new Integer(EnemyStats.ReturnDMG());
+                                newEnemyStatus = CombatCommands.AttackStatuses(EnemyStats.ReturnAllStatuses());
+                                newEnemyStatus.add(AllStatus.Bleed);
+                            }
+                            
                             //Akcja Defensywna gracza
                             Boolean PlayerActionDone = false;
                             while(!PlayerActionDone)
@@ -339,6 +482,17 @@ public class Combat
                                                     AdditionalDMessage = "Odzyskano 3 punkty akcji";
                                                     PlayerStats.ChangeMana(5);
                                                 }
+                                                if(PlayerActions.get(x).equals(AllSkills.counterAttack))
+                                                {
+                                                    DefenceValue = PlayerStats.ReturnArmor();
+                                                    newPlayerStatus.add(AllStatus.CounterAttack);
+                                                }
+                                                if(PlayerActions.get(x).equals(AllSkills.Heal))
+                                                {
+                                                    DefenceValue = PlayerStats.ReturnArmor();
+                                                    PlayerStats.ChangeHP(10);
+                                                    AdditionalDMessage = "Leczysz 10 PZ";
+                                                }
                                             }
                                             else
                                             {
@@ -356,20 +510,23 @@ public class Combat
                                         }
                                         else
                                         {
+                                            OtherFunctions.clearScreen();
                                             System.out.println("Nie wystarczająca liczba punktów akcji");
                                         }
                                     }
                                     else
                                     {
+                                        OtherFunctions.clearScreen();
                                         System.out.println("Nie znana komenda");
                                     }
                                 }
                                 else
                                 {
+                                    OtherFunctions.clearScreen();
                                     System.out.println("Nie znana komenda");
                                 }
                             }
-                            CombatCommands.Result(PlayerStats,AttackValue,DefenceValue,false,AdditionalOMessage,AdditionalDMessage,newEnemyStatus,newPlayerStatus);
+                            CombatCommands.Result(PlayerStats,EnemyStats,AttackValue,DefenceValue,false,AdditionalOMessage,AdditionalDMessage,newEnemyStatus,newPlayerStatus);
                             if(EnemyActions.get(y).equals(AllSkills.biteAttack) && AttackValue < DefenceValue)    //Odnowienie PA
                             {
                                 EnemyStats.ChangeMana(2);
@@ -379,6 +536,19 @@ public class Combat
                             {
                                 PlayerStats.ChangeMana(-1);
                                 System.out.println("Tracisz 2 punkty akcji");
+                            }
+                            if(EnemyStats.ReturnAllStatuses().contains(AllStatus.CounterAttack))        //Kontraatak
+                            {
+                                System.out.println("--- Wykonujesz Kontraatak ---");
+                                DefenceValue = EnemyStats.ReturnArmor();
+                                AttackValue = new Integer(( (int) Math.ceil((double) PlayerStats.ReturnDMG()/2)));
+                                CombatCommands.Result(EnemyStats,PlayerStats,AttackValue,DefenceValue,true,"","",new ArrayList<Status>(),new ArrayList<Status>());
+                                EnemyStats.RemoveStatus(AllStatus.CounterAttack);
+                            }
+                            if(PlayerStats.ReturnAllStatuses().contains(AllStatus.Thorns) && AttackValue > DefenceValue)           //Ciernie
+                            {
+                                EnemyStats.ChangeHP(-1);
+                                System.out.println("Kolczasta zbroja zadaje przeciwnikowi obrażenia równe 1");
                             }
                             EnemyActions.remove(EnemyActions.get(y));
                             //Sprawdzenie czy któryś z przeciwników jest martwy

@@ -53,7 +53,7 @@ public class CombatCommands {
         }
         return min;
     }
-    public static void Result(UnitStats Deffender, Integer AttackValue, Integer DefenceValue,
+    public static void Result(UnitStats Deffender,UnitStats Attacker, Integer AttackValue, Integer DefenceValue,
     Boolean ResultForAttacker,String OMessage, String DMessage,ArrayList<Status> AttackerStatus,ArrayList<Status> DefenderStatus)
     {
         Integer Diffrence = DefenceValue - AttackValue;
@@ -66,17 +66,41 @@ public class CombatCommands {
                 System.out.println("Atak zadał "+(-1*Diffrence)+" obrażeń");
                 for(int i=0;i<AttackerStatus.size();i++)
                 {
-                    Deffender.AddStatus(AttackerStatus.get(i)); //Dokończyć przedłużanie statusu
-                    System.out.println("Nałożono efekt: "+AttackerStatus.get(i).ReturnName());
+                    Deffender.AddStatus(AttackerStatus.get(i));
+                    if(!AttackerStatus.get(i).equals(AllStatus.CounterAttack))
+                    {
+                        System.out.println("Nałożono efekt: "+AttackerStatus.get(i).ReturnName());
+                    }
+                }
+                for(int i=0;i<DefenderStatus.size();i++)
+                {
+                    Attacker.AddStatus(DefenderStatus.get(i));
                 }
             }
             else
             {
                 System.out.println("Otrzymano "+(-1*Diffrence)+" obrażeń");
-                for(int i=0;i<AttackerStatus.size();i++)
+                for(int i=0;i<AttackerStatus.size();i++)                    //Statusy nakładane przez napastnika
                 {
-                    Deffender.AddStatus(AttackerStatus.get(i));
-                    System.out.println("Otrzymano efekt: "+AttackerStatus.get(i).ReturnName());
+                    //System.out.println(AttackerStatus.get(i).ReturnName()+"=="+AllStatus.LifeSteal.ReturnName());
+                    if(AttackerStatus.get(i).ReturnName().equals(AllStatus.LifeSteal.ReturnName()))   //Kradzież życia
+                    {
+                        int heal = (int) Math.ceil((double) (Diffrence*-1)/4);
+                        Attacker.ChangeHP(heal);
+                        System.out.println(Attacker.ReturnName()+" Leczy "+heal+" PZ");
+                    }
+                    else
+                    {
+                        Deffender.AddStatus(AttackerStatus.get(i));
+                        if(!AttackerStatus.get(i).equals(AllStatus.CounterAttack))
+                        {
+                            System.out.println("Otrzymano efekt: "+AttackerStatus.get(i).ReturnName());
+                        }
+                    }
+                }
+                for(int i=0;i<DefenderStatus.size();i++)            //Statusy nakładane przez obrońce
+                {
+                    Attacker.AddStatus(DefenderStatus.get(i));
                 }
             }
         }
@@ -84,7 +108,7 @@ public class CombatCommands {
         {
             if(ResultForAttacker)
             {
-                System.out.println("Atak zadał żadnych obrażeń");
+                System.out.println("Atak nie zadał żadnych obrażeń");
             }
             else
             {
@@ -108,6 +132,14 @@ public class CombatCommands {
             if(AttackerStatuses.get(i).equals(AllStatus.PoisonAttack)) //Trujący cios
             {
                 newStatuses.add(new Status(AllStatus.Poison));
+            }
+            else if(AttackerStatuses.get(i).equals(AllStatus.StunAttack)) //Ogłuszający cios
+            {
+                newStatuses.add(new Status(AllStatus.Stun));
+            }
+            else if(AttackerStatuses.get(i).equals(AllStatus.LifeSteal)) //Ogłuszający cios
+            {
+                newStatuses.add(new Status(AllStatus.LifeSteal));
             }
         }
         return newStatuses;

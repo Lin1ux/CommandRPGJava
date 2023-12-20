@@ -179,7 +179,7 @@ public class UnitStats
     {
         for(int i=0;i<CurrentStatuses.size();i++)
         {
-            System.out.println(CurrentStatuses.get(i).ReturnName()+":"+CurrentStatuses.get(i).ReturnDuration()+" - "+AllStatus.Poison.ReturnDuration());
+            //System.out.println(CurrentStatuses.get(i).ReturnName()+":"+CurrentStatuses.get(i).ReturnDuration()+" - "+AllStatus.Poison.ReturnDuration());
             if(CurrentStatuses.get(i).ReturnType().equals(Status.ShortTime))
             {   
                 CurrentStatuses.get(i).durationDown();  

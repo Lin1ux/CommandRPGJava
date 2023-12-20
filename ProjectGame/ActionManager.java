@@ -60,7 +60,7 @@ public class ActionManager
         //Walki
         Combat Gremlin = new Combat( "Zgred",Visuals.GramlinVisual(),Enemy1);
         Combat Raptor = new Combat( "Raptor",Visuals.RaptorVisual(),Enemy2);
-        Combat BloodThister = new Combat( "Krwiopijec",Visuals.GramlinVisual(),Enemy3);
+        Combat BloodThister = new Combat( "Krwiopijec",Visuals.BloodThisterVisual(),Enemy3);
         Combat Golem = new Combat( "Golem",Visuals.GramlinVisual(),Enemy4);
 
         while(!GameOver)
@@ -100,13 +100,23 @@ public class ActionManager
                 World.get(CurrentPosition).SetGlobalCommands(GlobalCommands);
                 if(World.get(CurrentPosition).ReturnCommandList().contains("walka"))
                 {    
-                    World.get(CurrentPosition).Description("Przed tobą zauważasz przewrócony wóz oraz Raptora atakującego jego właścicieli");
+                    World.get(CurrentPosition).Description("Na twojej drodze stoi wóz");
                 }
                 else
                 {
                     World.get(CurrentPosition).SetVisual(Visuals.CartVisual());
                     World.get(CurrentPosition).Description("Na drodze znajduje się zniszczony wóz");
                 }
+            }
+            else if(CurrentPosition == AllLocations.Town)
+            {
+                World.get(CurrentPosition).SetGlobalCommands(GlobalCommands);
+                World.get(CurrentPosition).Description("Znajdujesz się w miasteczku Piachy");
+            }
+            else if(CurrentPosition == AllLocations.Lake)
+            {
+                World.get(CurrentPosition).SetGlobalCommands(GlobalCommands);
+                World.get(CurrentPosition).Description("Przed tobą znajduje się przerażający wojownik");
             }
             //Komendy gracza
             if(Action.toLowerCase().equals("statystyki") || Action.toLowerCase().equals("st"))
@@ -176,11 +186,14 @@ public class ActionManager
                         CombatWon = Raptor.CombatScript(s,PlayerStats);
                         World.get(CurrentPosition).CommandManager("remove","walka");
                         World.get(CurrentPosition).CommandManager("add","polnoc");
+                        World.get(CurrentPosition).CommandManager("add","woz");
                     }
                     else if(CurrentPosition == AllLocations.Lake)
                     {
                         CombatWon = BloodThister.CombatScript(s,PlayerStats);
                         World.get(CurrentPosition).CommandManager("remove","walka");
+                        Inventory.AddArmor(ItemList.ThornArmor);
+                        System.out.println("Otrzymujesz kolczastą zbroję");
                     }
                     else if(CurrentPosition == AllLocations.LastRoom)
                     {
@@ -203,6 +216,13 @@ public class ActionManager
             else if(Action.toLowerCase().equals("platnerz"))
             {
                 World.get(CurrentPosition).Armorer(s,PlayerStats);
+                OtherFunctions.clearScreen();
+                Action = "";
+                continue;
+            }
+            else if(Action.toLowerCase().equals("kowal"))
+            {
+                World.get(CurrentPosition).Blacksmith(s,PlayerStats);
                 OtherFunctions.clearScreen();
                 Action = "";
                 continue;
@@ -234,6 +254,13 @@ public class ActionManager
             {   
                 OtherFunctions.clearScreen();
                 World.get(CurrentPosition).Armadillo(s,PlayerStats);
+            }
+            else if(Action.toLowerCase().equals("woz"))
+            {   
+                OtherFunctions.clearScreen();
+                World.get(CurrentPosition).BrokenCart(s,PlayerStats);
+                Action = "";
+                continue;
             }
             else if(Action.toLowerCase().equals("drzwi") || Action.toLowerCase().equals("dr"))
             {
@@ -280,7 +307,7 @@ public class ActionManager
             if(!CombatWon)
             {
                 OtherFunctions.clearScreen();
-                System.out.println("Zostałeś pokonany!");
+                System.out.println("Pokonano cię!");
                 System.out.println("Wciśnij Enter aby zakończyć grę.");
                 Action = s.nextLine();
                 GameOver = true;

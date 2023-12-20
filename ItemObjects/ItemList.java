@@ -7,6 +7,7 @@ public class ItemList
     public static Items HPPotion = new Items("Mikstura Zdrowia","Odnawia 25 Punktów Zdrowia",2);
     public static Items Drink = new Items("Pancerianska","Słodki napój wysoko alkoholowy",10);
     public static Items Poison = new Items("Trucizna","Jad węża, który można użyć do zatrucia broni",2);
+    public static Items Healing = new Items("Medalion Życia","Uczy umięjętności Leczenie (uczy automatycznie)",50);
     
     //Bronie
     public static Weapons dagger = new Weapons("Sztylet", "Dość stary ale wciąż wystarczająco ostry", 6,0);

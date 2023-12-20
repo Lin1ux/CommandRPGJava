@@ -14,9 +14,9 @@ public class AllSkills
     public static Skills StunAttack = new Skills("Uderzenie Rękojeścią", "Gniew",2,
     "Atak zadający 20% obrażeń i redukujący Punkty Akcji przeciwnika o 2",
     "Generuje 5 (ostatecznie 3) Punkty Akcji");
-    public static Skills counterAttack = new Skills("Krwawiący atak  ", "Kontraatak",5,
+    public static Skills counterAttack = new Skills("Krwawiący atak", "Kontraatak",5,
     "Atak zadający 100% obrażeń i jeśli zadał obrażenia nakłada krwawienie",
-    "Przyjmuje pełne obrażenia (zredukowane o pancerz) i zadaje 50% obrażeń przeciwnikowi"); //Dokończyć w walce
+    "Przyjmuje pełne obrażenia (zredukowane o pancerz) i zadaje 50% obrażeń przeciwnikowi");
     public static Skills biteAttack = new Skills("Ugryzienie", "Przyjęcie",4,
     "Atak zadający 50% obrażeń jeśli nie został trafiony zwraca 2 punkty akcji",
     "Nie reaguje na atak"); 
@@ -26,6 +26,9 @@ public class AllSkills
     public static Skills LaserAttack = new Skills("Kryształowy Strzał", "Blok Idealny",5,
     "Atak zadje 200% obrażeń i ignoruje pancerz",
     "Blok, który redukuje wszystkie obrażenia"); //Dokończyć w walce
+    public static Skills Heal = new Skills("Uzdrowienie", "Uzdrowienie",3,
+    "Odnawia 10 Punktów Zdrowia",
+    "Odnawia 10 Punktów Zdrowia"); //Dokończyć w walce
 
     public static Skills Wait = new Skills("Zakończ", "Przyjęcie",0,
     "Kończy turę ataku",

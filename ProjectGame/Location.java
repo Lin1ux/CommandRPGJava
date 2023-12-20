@@ -9,6 +9,7 @@ import Combat.UnitStats;
 import ItemObjects.Armor;
 import ItemObjects.ItemList;
 import ItemObjects.Items;
+import ItemObjects.Weapons;
 
 
 public class Location 
@@ -139,6 +140,10 @@ public class Location
             {
                 newLocation = AllLocations.Cart;        //Wózek
             }
+            if(locationId == AllLocations.Cart)
+            {
+                newLocation = AllLocations.Town;        //Wózek
+            }
         }
         return newLocation;
     }
@@ -149,7 +154,11 @@ public class Location
         {
             if(locationId == AllLocations.Cart)
             {
-                newLocation = AllLocations.Armadillo;        //Chatka
+                newLocation = AllLocations.Armadillo;      
+            }
+            else if(locationId == AllLocations.Town)
+            {
+                newLocation = AllLocations.Cart;    
             }
         }
         return newLocation;
@@ -161,11 +170,15 @@ public class Location
         {
             if(locationId == AllLocations.Armadillo)
             {
-                newLocation = AllLocations.Road;        //Droga
+                newLocation = AllLocations.Road;       
             }
             else if(locationId == AllLocations.Road)
             {
-                newLocation = AllLocations.Village;        //Wioska
+                newLocation = AllLocations.Village;      
+            }
+            else if(locationId == AllLocations.Town)
+            {
+                newLocation = AllLocations.Lake;    
             }
         }
         return newLocation;
@@ -177,11 +190,19 @@ public class Location
         {
             if(locationId == AllLocations.Road)
             {
-                newLocation = AllLocations.Armadillo;        //Chatka
+                newLocation = AllLocations.Armadillo;        
             }
             else if(locationId == AllLocations.Village)
             {
-                newLocation = AllLocations.Road;        //Droga
+                newLocation = AllLocations.Road;        
+            }
+            else if(locationId == AllLocations.Town)
+            {
+                newLocation = AllLocations.CaveEntrance;    
+            }
+            else if(locationId == AllLocations.Lake)
+            {
+                newLocation = AllLocations.Town;    
             }
         }
         return newLocation;
@@ -365,6 +386,81 @@ public class Location
             }
         }
     }
+    public void Blacksmith(Scanner s,UnitStats PlayerStats)
+    {
+        if(commandsList.contains("kowal"))
+        {
+            String PlayerInput = "";
+            while(!PlayerInput.toLowerCase().equals("wyjscie") && !PlayerInput.toLowerCase().equals("wy") && !PlayerInput.toLowerCase().equals("2"))
+            {
+                OtherFunctions.clearScreen();
+                System.out.println("Płatnerz: Witaj w mojej kuźni czy chcesz zobaczyć moje towary?");
+                QuickTexts.WhatToDoV(visual,new ArrayList<String>(Arrays.asList(new String[]{"sklep","wyjscie"})));
+                PlayerInput = s.nextLine();
+                if(PlayerInput.toLowerCase().equals("sklep") || PlayerInput.toLowerCase().equals("sk") || PlayerInput.toLowerCase().equals("1"))
+                {
+                    //Przedmioty do kupienia
+                    ArrayList<Weapons> ShopItems = new ArrayList<Weapons>();
+                    ShopItems.add(ItemList.Sword);
+                    ShopItems.add(ItemList.LongSword);
+                    ShopItems.add(ItemList.Hammer);
+                    ShopItems.add(ItemList.Spear);
+                    PlayerInput = "";
+                    Boolean ItemBought = false; //czy kupiono przedmiot
+                    OtherFunctions.clearScreen();
+                    while(!ItemBought)
+                    {
+                        System.out.println("Dostępne towary (Posiadane złoto: "+PlayerStats.ReturnGold()+"):");
+                        for(int i=0;i<ShopItems.size();i++)
+                        {
+                            System.out.println((i+1)+") "+ShopItems.get(i).ReturnName()+" | Obrażenia: "+ShopItems.get(i).ReturnDamage()+" | Koszt: "+ShopItems.get(i).ReturnCost());
+                        }
+                        System.out.println("4) Wyjście");
+                        System.out.println("Podaj wartość od 1-"+(ShopItems.size()+1)+":");
+                        PlayerInput = s.nextLine();
+                        try
+                        {
+                            //wybeiranie przedmiotów
+                            if(Integer.valueOf(PlayerInput) <= ShopItems.size()) //Czy komenda mieści się w zakresie
+                            {
+                                Integer x = Integer.valueOf(PlayerInput) - 1;
+                                if(ShopItems.get(x).ReturnCost() <= PlayerStats.ReturnGold())
+                                {
+                                    PlayerStats.ChangeGold(-ShopItems.get(x).ReturnCost());
+                                    inventory.AddWeapon(ShopItems.get(x));
+                                    OtherFunctions.clearScreen();
+                                    System.out.println("Kupiono: "+ShopItems.get(x).ReturnName()+" Wydano: "+ShopItems.get(x).ReturnCost());
+                                    ItemBought = true;
+                                    PlayerInput = "wyjscie";
+                                }
+                                else
+                                {
+                                    OtherFunctions.clearScreen();
+                                    System.out.println("Posiadasz za mało złota");
+                                }
+                            }
+                            else if(Integer.valueOf(PlayerInput) <= ShopItems.size()+1)
+                            {
+                                OtherFunctions.clearScreen();
+                                ItemBought = true;
+                                PlayerInput = "wyjscie";
+                            }
+                            else
+                            {
+                                OtherFunctions.clearScreen();
+                                System.out.println("Nie znana komenda");
+                            }
+                        }
+                        catch(Exception e) //Dokończyć sklep 
+                        {
+                            OtherFunctions.clearScreen();
+                            System.out.println("Nie znana komenda"); 
+                        }
+                    }
+                }
+            }
+        }
+    }
     public void Tavern(Scanner s,UnitStats PlayerStats)
     {
         if(commandsList.contains("karczma"))
@@ -493,6 +589,16 @@ public class Location
                     }
                 }
             }
+        }
+    }
+    public void BrokenCart(Scanner s,UnitStats Player)
+    {
+        if(commandsList.contains("woz"))
+        {
+            System.out.println("Przeszukujesz wóz i znajdujesz medalion");
+            inventory.AddItem(ItemList.Healing);
+            Player.AddSkill(AllSkills.Heal);
+            CommandManager("remove","woz");
         }
     }
     public void Sleep(UnitStats Player)

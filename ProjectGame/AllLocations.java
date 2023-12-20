@@ -29,12 +29,12 @@ public class AllLocations
     new ArrayList<String>(Arrays.asList(new String[]{"zachod","platnerz","alchemik","karczma"})));
 
     public static Location CartLocation = new Location(Cart,"Zniszczony wóz",Visuals.RaptorVisual(),
-    new ArrayList<String>(Arrays.asList(new String[]{"poludnie","walka"})));
+    new ArrayList<String>(Arrays.asList(new String[]{"poludnie","walka","polnoc"}))); //Dokończyć usunąć komendę polnoc
 
-    public static Location TownLocation = new Location(Town,"Miasteczko Piachy",Visuals.EmptyVisual(),
+    public static Location TownLocation = new Location(Town,"Miasteczko Piachy",Visuals.TownVisual(),
     new ArrayList<String>(Arrays.asList(new String[]{"poludnie","wschod","zachod","karczma","kowal"})));
 
-    public static Location LakeLocation = new Location(Lake,"Jezioro",Visuals.EmptyVisual(),
+    public static Location LakeLocation = new Location(Lake,"Jezioro",Visuals.BloodThisterVisual(),
     new ArrayList<String>(Arrays.asList(new String[]{"zachod","walka"})));
 
     public static Location CaveLocation = new Location(CaveEntrance,"Wejście do jaskini",Visuals.EmptyVisual(),

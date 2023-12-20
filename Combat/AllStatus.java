@@ -12,9 +12,11 @@ public class AllStatus
     
     //Na czas bitwy
     public static Status PoisonAttack = new Status("Trujący Cios","Każdy atak, który zada obrażenia nakłada efekt trucizny, który zadaje obrażenia w czasie", Status.CombatTime, -1);
+    public static Status CounterAttack = new Status("Kontraatak","Po otrzymaniu trafionego ataku zadaje napastnikowi 50% obrażeń", Status.CombatTime, -1);
 
     //Na kilka tur
     public static Status Poison = new Status("Zatrucie","Na początku tury otrzymuje obrażenia równe 3",Status.ShortTime,2);
     public static Status Bleed = new Status("Krwawienie","Na początku tury otrzymuje obrażenia równe 2",Status.ShortTime,3); //Dokończyć w walce
     public static Status Stun = new Status("Oszołomienie","Na początku tury traci 1 Punkt Akcji",Status.ShortTime,2);        //Dokończyć w walce
+    
 }

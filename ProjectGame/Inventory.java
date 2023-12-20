@@ -45,7 +45,6 @@ public class Inventory
                 OtherFunctions.clearScreen();
                 System.out.println("|Używana broń:     |"+CurrentWeapon.ReturnName()+" | Obrażenia: "+CurrentWeapon.ReturnDamage().toString());
                 System.out.println("Posiadane bronie:");
-                //System.out.println(Integer.valueOf("df"));
                 if(!Weapons.isEmpty())
                 {
                     for(int i=0;i<Weapons.size();i++)
@@ -60,7 +59,7 @@ public class Inventory
                 System.out.println("--------------------------------");
                 System.out.println("Podaj numer broni");
                 PlayerInput = s.nextLine();
-                ChangeWeapon(PlayerInput);
+                ChangeWeapon(PlayerInput,Player);
                 Player.SetDefaultDMG(ReturnWeaponsDamage());
                 Player.ResetDMG();
             }
@@ -100,7 +99,7 @@ public class Inventory
                     {
                         for(int i=0;i<OtherItems.size();i++)
                         {
-                            System.out.println(OtherItems.get(i).ReturnName()+" - "+OtherItems.get(i).ReturnDescr());
+                            System.out.println((i+1)+") "+OtherItems.get(i).ReturnName()+" - "+OtherItems.get(i).ReturnDescr());
                         }
                     }
                     else
@@ -118,7 +117,6 @@ public class Inventory
         }
         OtherFunctions.clearScreen();
         return Position;
-        
     }
     public void SetCurrentWeapon(Weapons weapon)
     {
@@ -128,12 +126,28 @@ public class Inventory
     {
         Weapons.add(weapon);
     }
-    public void ChangeWeapon(String weaponName)
+    public void ChangeWeapon(String weaponName,UnitStats Player)
     {
         try 
         {
             Integer i = Integer.valueOf(weaponName)-1;
+            if(Weapons.get(i) == ItemList.Hammer)
+            {
+                Player.AddStatus(AllStatus.StunAttack);
+            }
+            else if(Weapons.get(i) == ItemList.Spear)
+            {
+                Player.AddStatus(AllStatus.PenetrationAttack);
+            }
             AddWeapon(CurrentWeapon);
+            if(CurrentWeapon.equals(ItemList.Hammer))
+            {
+                Player.RemoveStatus(AllStatus.StunAttack);
+            }
+            else if(CurrentWeapon.equals(ItemList.Spear))
+            {
+                Player.RemoveStatus(AllStatus.PenetrationAttack);
+            }
             SetCurrentWeapon(Weapons.get(i));
             Weapons.remove(Weapons.get(i));
             i=Weapons.size();
@@ -167,36 +181,39 @@ public class Inventory
     }
     public Integer UseItem(String itemName,UnitStats PlayerStats, Integer Position)
     {
-        for(int i=0;i<OtherItems.size();i++)
+        try 
+        {
+            Integer i = Integer.valueOf(itemName)-1;
+            OtherFunctions.clearScreen();
+            if(OtherItems.get(i).equals(ItemList.HPPotion))
+            {
+                PlayerStats.ChangeHP(25);
+                System.out.println("Wypito miksturę zdrowia i odzyskano 25 Punktów Zdrowia");
+                OtherItems.remove(OtherItems.get(i));
+            }
+            else if(OtherItems.get(i).equals(ItemList.compass))
+            {
+                ItemFunctions.CompassTarget(Position);
+            }
+            else if(OtherItems.get(i).equals(ItemList.Drink))
+            {
+                Position = new Integer(ItemFunctions.Alcohol(Position));
+                OtherItems.remove(OtherItems.get(i));
+            }
+            else if(OtherItems.get(i).equals(ItemList.Poison))
+            {
+                PlayerStats.AddStatus(AllStatus.PoisonAttack);
+                System.out.println("Twoja broń została posmarowana trucizną");
+                OtherItems.remove(OtherItems.get(i));
+            }
+        }     
+        catch (Exception e) 
         {
             OtherFunctions.clearScreen();
-            if(OtherItems.get(i).ReturnName().toLowerCase().equals(itemName.toLowerCase()))
-            {
-                if(OtherItems.get(i).equals(ItemList.HPPotion))
-                {
-                    PlayerStats.ChangeHP(25);
-                    System.out.println("Wypito miksturę zdrowia i odzyskano 25 Punktów Zdrowia");
-                    OtherItems.remove(OtherItems.get(i));
-                }
-                else if(OtherItems.get(i).equals(ItemList.compass))
-                {
-                    ItemFunctions.CompassTarget(Position);
-                }
-                else if(OtherItems.get(i).equals(ItemList.Drink))
-                {
-                    Position = new Integer(ItemFunctions.Alcohol(Position));
-                    OtherItems.remove(OtherItems.get(i));
-                }
-                else if(OtherItems.get(i).equals(ItemList.Poison))
-                {
-                    PlayerStats.AddStatus(AllStatus.PoisonAttack);
-                    System.out.println("Twoja broń została posmarowana trucizną");
-                    OtherItems.remove(OtherItems.get(i));
-                }
-                System.out.println("---------------------");
-                i = OtherItems.size();
-            }
+            System.out.println("Nie posiadasz przedmiotu o podanym numerze");
         }
+        System.out.println("---------------------");
+        
         return Position;
     }
     public void AddArmor(Armor armor)
