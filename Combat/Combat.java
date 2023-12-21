@@ -573,6 +573,7 @@ public class Combat
         OtherFunctions.clearScreen();
         if(CombatWon)
         {
+            PlayerStats.CombatStatusDown();
             PlayerStats.SetArmor(DefaultPStats.ReturnArmor());
             PlayerStats.SetDMG(DefaultPStats.ReturnDMG());
             PlayerStats.ResetSpeed();

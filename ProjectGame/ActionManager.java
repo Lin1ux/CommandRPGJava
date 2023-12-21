@@ -116,7 +116,37 @@ public class ActionManager
             else if(CurrentPosition == AllLocations.Lake)
             {
                 World.get(CurrentPosition).SetGlobalCommands(GlobalCommands);
-                World.get(CurrentPosition).Description("Przed tobą znajduje się przerażający wojownik");
+                if(World.get(CurrentPosition).ReturnCommandList().contains("walka"))
+                {    
+                    World.get(CurrentPosition).Description("Przed tobą znajduje się przerażający wojownik");
+                }
+                else
+                {
+                    World.get(CurrentPosition).SetVisual(Visuals.LakeVisual());
+                    World.get(CurrentPosition).Description("Przed tobą znajduje się spokojne jezioro");
+                }
+            }
+            else if(CurrentPosition == AllLocations.CaveEntrance)
+            {
+                World.get(CurrentPosition).SetGlobalCommands(GlobalCommands);
+                World.get(CurrentPosition).Description("Przed tobą znajdują się zamknięte wrota");
+            }
+            else if(CurrentPosition == AllLocations.CaveQuest)
+            {
+                World.get(CurrentPosition).SetGlobalCommands(GlobalCommands);
+                if(World.get(CurrentPosition).ReturnCommandList().contains("wejscie"))
+                {    
+                    World.get(CurrentPosition).Description("Wchodzisz do pokoju i zauważasz naczynie");
+                }
+                else
+                {
+                    World.get(CurrentPosition).Description("Pokój wygląda na ślepy zaułek. Na jego końcu ktoś wyrył w skale jakiś tekst.");
+                }
+            }
+            else if(CurrentPosition == AllLocations.LastRoom)
+            {
+                World.get(CurrentPosition).SetGlobalCommands(GlobalCommands);
+                World.get(CurrentPosition).Description("Drzwi zamykają się za tobą, a przed tobą znajduje się artefakt.");
             }
             //Komendy gracza
             if(Action.toLowerCase().equals("statystyki") || Action.toLowerCase().equals("st"))
@@ -162,7 +192,7 @@ public class ActionManager
             else if(Action.toLowerCase().equals("ekwipunek") || Action.toLowerCase().equals("e"))
             {
                 //Ekwipunek
-                ChangeCurrentPosition(Inventory.InventoryMenu(s,PlayerStats,CurrentPosition));
+                ChangeCurrentPosition(Inventory.InventoryMenu(s,PlayerStats,CurrentPosition,World));
                 Action = "";
                 continue;
             }
@@ -179,7 +209,7 @@ public class ActionManager
                     {
                         CombatWon = Gremlin.CombatScript(s,PlayerStats);
                         World.get(CurrentPosition).CommandManager("remove","walka");
-                        World.get(CurrentPosition).CommandManager("add","wschod");
+                        World.get(CurrentPosition).CommandManager("add","zachod");
                     }
                     else if(CurrentPosition == AllLocations.Cart)
                     {
@@ -212,6 +242,10 @@ public class ActionManager
             else if(Action.toLowerCase().equals("miecz"))
             {   
                 World.get(CurrentPosition).Sword(s);
+            }
+            else if(Action.toLowerCase().equals("wrota"))
+            {   
+                World.get(CurrentPosition).Gate(s);
             }
             else if(Action.toLowerCase().equals("platnerz"))
             {
@@ -262,6 +296,32 @@ public class ActionManager
                 Action = "";
                 continue;
             }
+            else if(Action.toLowerCase().equals("skrzynka"))
+            {   
+                OtherFunctions.clearScreen();
+                World.get(CurrentPosition).Chest(PlayerStats);
+                Action = "";
+                continue;
+            }
+            else if(Action.toLowerCase().equals("naczynie"))
+            {   
+                OtherFunctions.clearScreen();
+                World.get(CurrentPosition).Vessel();
+                Action = "";
+                continue;
+            }
+            else if(Action.toLowerCase().equals("tekst"))
+            {
+                OtherFunctions.clearScreen();
+                World.get(CurrentPosition).Quest();
+            }
+            else if(Action.toLowerCase().equals("powrot"))
+            {   
+                ChangeCurrentPosition(new Integer(World.get(CurrentPosition).Return()));
+                Action = "";
+                OtherFunctions.clearScreen();
+                continue;
+            }
             else if(Action.toLowerCase().equals("drzwi") || Action.toLowerCase().equals("dr"))
             {
                 ChangeCurrentPosition(new Integer(World.get(CurrentPosition).Door()));
@@ -272,6 +332,20 @@ public class ActionManager
             else if(Action.toLowerCase().equals("chatka") || Action.toLowerCase().equals("ch"))
             {
                 ChangeCurrentPosition(new Integer(World.get(CurrentPosition).House()));
+                Action = "";
+                OtherFunctions.clearScreen();
+                continue;
+            }
+            else if(Action.toLowerCase().equals("loch"))
+            {   
+                ChangeCurrentPosition(new Integer(World.get(CurrentPosition).Dungeon()));
+                Action = "";
+                OtherFunctions.clearScreen();
+                continue;
+            }
+            else if(Action.toLowerCase().equals("wejscie"))
+            {   
+                ChangeCurrentPosition(new Integer(World.get(CurrentPosition).Entrance()));
                 Action = "";
                 OtherFunctions.clearScreen();
                 continue;
@@ -290,14 +364,14 @@ public class ActionManager
                 OtherFunctions.clearScreen();
                 continue;
             }
-            else if(Action.toLowerCase().equals("wschod") || Action.toLowerCase().equals("a") || Action.toLowerCase().equals("ws"))
+            else if(Action.toLowerCase().equals("wschod") || Action.toLowerCase().equals("d") || Action.toLowerCase().equals("ws"))
             {
                 ChangeCurrentPosition(new Integer(World.get(CurrentPosition).East()));
                 Action = "";
                 OtherFunctions.clearScreen();
                 continue;
             }
-            else if(Action.toLowerCase().equals("zachod") || Action.toLowerCase().equals("d") || Action.toLowerCase().equals("za"))
+            else if(Action.toLowerCase().equals("zachod") || Action.toLowerCase().equals("a") || Action.toLowerCase().equals("za"))
             {
                 ChangeCurrentPosition(new Integer(World.get(CurrentPosition).West()));
                 Action = "";

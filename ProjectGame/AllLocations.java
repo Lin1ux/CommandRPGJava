@@ -20,13 +20,13 @@ public class AllLocations
     new ArrayList<String>(Arrays.asList(new String[]{"drzwi","miecz"})));
 
     public static Location SmallHouseLocation = new Location(Armadillo,"Mała Chatka",Visuals.ArmadilloVisual(),
-    new ArrayList<String>(Arrays.asList(new String[]{"polnoc","wschod","chatka","postac"})));
+    new ArrayList<String>(Arrays.asList(new String[]{"polnoc","zachod","chatka","postac"})));
 
     public static Location RoadLocation = new Location(Road,"Droga",Visuals.GramlinVisual(),
-    new ArrayList<String>(Arrays.asList(new String[]{"zachod","walka","wschod"})));   //Dokończyć usunąć komendę wschód
+    new ArrayList<String>(Arrays.asList(new String[]{"wschod","walka","zachod"})));   //Dokończyć usunąć komendę zachod
 
     public static Location VillageLocation = new Location(Village,"Wioska Dróżka",Visuals.VillageVisual(),
-    new ArrayList<String>(Arrays.asList(new String[]{"zachod","platnerz","alchemik","karczma"})));
+    new ArrayList<String>(Arrays.asList(new String[]{"wschod","platnerz","alchemik","karczma"})));
 
     public static Location CartLocation = new Location(Cart,"Zniszczony wóz",Visuals.RaptorVisual(),
     new ArrayList<String>(Arrays.asList(new String[]{"poludnie","walka","polnoc"}))); //Dokończyć usunąć komendę polnoc
@@ -35,14 +35,14 @@ public class AllLocations
     new ArrayList<String>(Arrays.asList(new String[]{"poludnie","wschod","zachod","karczma","kowal"})));
 
     public static Location LakeLocation = new Location(Lake,"Jezioro",Visuals.BloodThisterVisual(),
-    new ArrayList<String>(Arrays.asList(new String[]{"zachod","walka"})));
+    new ArrayList<String>(Arrays.asList(new String[]{"wschod","walka"})));
 
-    public static Location CaveLocation = new Location(CaveEntrance,"Wejście do jaskini",Visuals.EmptyVisual(),
-    new ArrayList<String>(Arrays.asList(new String[]{"wschod","wrota"})));
+    public static Location CaveLocation = new Location(CaveEntrance,"Wejście do jaskini",Visuals.CaveEntranceVisual(),
+    new ArrayList<String>(Arrays.asList(new String[]{"zachod","wrota"})));
 
-    public static Location CaveQuestLocation = new Location(CaveQuest,"Statua",Visuals.EmptyVisual(),
-    new ArrayList<String>(Arrays.asList(new String[]{"powrot","tekst"})));
+    public static Location CaveQuestLocation = new Location(CaveQuest,"Statua",Visuals.ChestVisual(),
+    new ArrayList<String>(Arrays.asList(new String[]{"powrot","tekst","skrzynka"})));
 
     public static Location LastRoomLocation = new Location(LastRoom,"Pokój z artefaktem",Visuals.EmptyVisual(),
-    new ArrayList<String>(Arrays.asList(new String[]{"powrot","kielich"})));
+    new ArrayList<String>(Arrays.asList(new String[]{"tekst","kielich"})));
 }

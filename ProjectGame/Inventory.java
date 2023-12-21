@@ -27,7 +27,7 @@ public class Inventory
         this.Weapons = new ArrayList<Weapons>();
         this.Armors = new ArrayList<Armor>();
     }
-    public Integer InventoryMenu(Scanner s, UnitStats Player,Integer Position)
+    public Integer InventoryMenu(Scanner s, UnitStats Player,Integer Position,ArrayList<Location> World)
     {
         String PlayerInput = "";
         while(!PlayerInput.toLowerCase().equals("wyjscie") && !PlayerInput.toLowerCase().equals("w") && !PlayerInput.toLowerCase().equals("4"))
@@ -82,7 +82,7 @@ public class Inventory
                 System.out.println("--------------------------------");
                 System.out.println("Podaj numer zbroi");
                 PlayerInput = s.nextLine();
-                ChangeArmor(PlayerInput);
+                ChangeArmor(PlayerInput,Player);
                 Player.SetDefaultArmor(ReturnArmorsValue());
                 Player.ResetArmor();
                 Player.SetDefaultSpeed(ReturnArmorsSpeed());
@@ -110,7 +110,7 @@ public class Inventory
                     System.out.println("Podaj nazwę przedmiotu aby go użyć (wpisz wyjscie aby wrócić)");
                     PlayerInput = s.nextLine();
                     //text = new String(ItemFunction(PlayerInput));
-                    Position = UseItem(PlayerInput,Player,Position);
+                    Position = UseItem(PlayerInput,Player,Position,World);
                 }
             }
             //PlayerInput = s.nextLine(); 
@@ -179,7 +179,7 @@ public class Inventory
         }
         return t;
     }
-    public Integer UseItem(String itemName,UnitStats PlayerStats, Integer Position)
+    public Integer UseItem(String itemName,UnitStats PlayerStats, Integer Position,ArrayList<Location> World)
     {
         try 
         {
@@ -206,6 +206,25 @@ public class Inventory
                 System.out.println("Twoja broń została posmarowana trucizną");
                 OtherItems.remove(OtherItems.get(i));
             }
+            else if(OtherItems.get(i).equals(ItemList.Chest))
+            {
+                if(Position == AllLocations.Lake)
+                {
+                    if(!World.get(AllLocations.Lake).ReturnCommandList().contains("walka"))
+                    {
+                        System.out.println("Napełniasz skrzynię wodą");
+                        World.get(AllLocations.CaveQuest).CommandManager("add","naczynie");
+                    }
+                    else
+                    {
+                        System.out.println("Próbujesz się zbliżyć do jeziora jednak kiedy próbujesz to zrobić, wojownik przygotowuje się do ataku");
+                    }
+                }
+                else
+                {
+                    System.out.println("W pobliżu nie ma niczego co mógłbyś dać do skrzynii");
+                }
+            }
         }     
         catch (Exception e) 
         {
@@ -224,8 +243,29 @@ public class Inventory
     {
         CurrentArmor = armor;
     }
-    public void ChangeArmor(String armorName)
+    public void ChangeArmor(String armorName,UnitStats Player)
     {
+        try 
+        {
+            Integer i = Integer.valueOf(armorName)-1;
+            if(Armors.get(i) == ItemList.ThornArmor)  //Kolczasta Kolczuga
+            {
+                Player.AddStatus(AllStatus.Thorns);
+            }
+            AddArmor(CurrentArmor);
+            if(CurrentArmor.equals(ItemList.ThornArmor))
+            {
+                Player.RemoveStatus(AllStatus.Thorns);
+            }
+            SetCurrentArmor(Armors.get(i));
+            Armors.remove(Armors.get(i));
+            i=Armors.size();
+        } 
+        catch (Exception e) 
+        {
+            
+        }
+        /*
         try 
         {
             Integer i = Integer.valueOf(armorName)-1;
@@ -247,7 +287,7 @@ public class Inventory
                 Armors.remove(i);
                 i=Armors.size();
             }
-        }
+        }*/
     }
     public Integer ReturnWeaponsDamage()
     {

@@ -163,10 +163,10 @@ public class Location
         }
         return newLocation;
     }
-    public Integer East()
+    public Integer West()
     {
         Integer newLocation = locationId;
-        if(commandsList.contains("wschod"))
+        if(commandsList.contains("zachod"))
         {
             if(locationId == AllLocations.Armadillo)
             {
@@ -180,13 +180,17 @@ public class Location
             {
                 newLocation = AllLocations.Lake;    
             }
+            else if(locationId == AllLocations.CaveEntrance)
+            {
+                newLocation = AllLocations.Town;    
+            }
         }
         return newLocation;
     }
-    public Integer West()
+    public Integer East()
     {
         Integer newLocation = locationId;
-        if(commandsList.contains("zachod"))
+        if(commandsList.contains("wschod"))
         {
             if(locationId == AllLocations.Road)
             {
@@ -207,6 +211,42 @@ public class Location
         }
         return newLocation;
     }
+    public Integer Dungeon()
+    {
+        Integer newLocation = locationId;
+        if(commandsList.contains("loch"))
+        {
+            if(locationId == AllLocations.CaveEntrance)
+            {
+                newLocation = AllLocations.CaveQuest;    
+            }
+        }
+        return newLocation;
+    }
+    public Integer Return()
+    {
+        Integer newLocation = locationId;
+        if(commandsList.contains("powrot"))
+        {
+            if(locationId == AllLocations.CaveQuest)
+            {
+                newLocation = AllLocations.CaveEntrance;    
+            }
+        }
+        return newLocation;
+    }
+    public Integer Entrance()
+    {
+        Integer newLocation = locationId;
+        if(commandsList.contains("wejscie"))
+        {
+            if(locationId == AllLocations.CaveQuest)
+            {
+                newLocation = AllLocations.LastRoom;    
+            }
+        }
+        return newLocation;
+    }
     public void Sword(Scanner s)
     {
         if(commandsList.contains("miecz"))
@@ -218,6 +258,64 @@ public class Location
                 System.out.println("Widzisz miecz leżący na ziemii czy chcesz go podnieść?");
                 QuickTexts.WhatToDoV(visual,new ArrayList<String>(Arrays.asList(new String[]{"podnies","zostaw"})));
                 PlayerInput = s.nextLine();
+            }
+            if(PlayerInput.toLowerCase().equals("podnies") || PlayerInput.toLowerCase().equals("p") || PlayerInput.toLowerCase().equals("1"))
+            {
+                OtherFunctions.clearScreen();
+                visual = Visuals.DoorVisual();
+                commandsList.remove("miecz");
+                Description("Miecz został podniesiony (za pomocą komendy |ekwipunek| możesz założyć tą broń)");
+                inventory.AddWeapon(ItemList.shortSword);
+            }
+            else if(PlayerInput.equals("zostaw") || PlayerInput.toLowerCase().equals("z") || PlayerInput.toLowerCase().equals("2"))
+            {
+                OtherFunctions.clearScreen();
+                Description("Postanawiasz nie dotykać miecza");
+            }
+        }
+        else
+        {
+            return;
+        }
+    }
+    public void Gate(Scanner s)
+    {
+        if(commandsList.contains("wrota"))
+        {
+            Boolean EndAction = false;
+            String PlayerInput = "";
+            while(!EndAction)
+            {
+                OtherFunctions.clearScreen();
+                System.out.println("Przed tobą znajdują się wrota");
+                QuickTexts.WhatToDoV(visual,new ArrayList<String>(Arrays.asList(new String[]{"popchnij","kopnij","kompas","wyjdz"})));
+                PlayerInput = s.nextLine();
+                if(PlayerInput.toLowerCase().equals("popchnij") || PlayerInput.toLowerCase().equals("1"))
+                {
+                    OtherFunctions.clearScreen();
+                    Description("Próbujesz popchnąć drzwi ale wydają się być za ciężkie");
+                    EndAction = true;
+                }
+                else if(PlayerInput.toLowerCase().equals("kopnij") || PlayerInput.toLowerCase().equals("2"))
+                {
+                    OtherFunctions.clearScreen();
+                    Description("Kopiesz prosto w drzwi ale nie przynosi to żadnych skutków");
+                    EndAction = true;
+                }
+                else if(PlayerInput.toLowerCase().equals("kompas") || PlayerInput.toLowerCase().equals("3"))
+                {
+                    OtherFunctions.clearScreen();
+                    commandsList.remove("wrota");
+                    commandsList.add("loch");
+                    Description("Wyjmujesz kompas, który wskazuje drzwi. Po chwili drzwi otwierają się");
+                    EndAction = true;
+                }
+                else if(PlayerInput.toLowerCase().equals("wyjdz") || PlayerInput.toLowerCase().equals("4"))
+                {
+                    OtherFunctions.clearScreen();
+                    Description("Odchodzisz od drzwi");
+                    EndAction = true;
+                }
             }
             if(PlayerInput.toLowerCase().equals("podnies") || PlayerInput.toLowerCase().equals("p") || PlayerInput.toLowerCase().equals("1"))
             {
@@ -599,6 +697,41 @@ public class Location
             inventory.AddItem(ItemList.Healing);
             Player.AddSkill(AllSkills.Heal);
             CommandManager("remove","woz");
+        }
+    }
+    public void Chest(UnitStats Player)
+    {
+        if(commandsList.contains("skrzynka"))
+        {
+            System.out.println("Podchodzisz do skrzynki i otwierasz ją. Widzisz, że jest pusta. Postanawiasz zabrać ją ze sobą");
+            inventory.AddItem(ItemList.Chest);
+            CommandManager("remove","skrzynka");
+        }
+    }
+    public void Quest()
+    {
+        if(commandsList.contains("tekst"))
+        {
+            if(locationId == AllLocations.CaveQuest)
+            {
+                Description("Tabliczka: Ma mnie każdy, lecz nie każdy lubi. Potrafisz uwierzyć?\n"+ 
+                "Możesz mnie dotknąć, zobaczyć, lecz nie zdołasz uderzyć.\n"+ 
+                "Bawię dziecko, przygnębiam starca, cieszę dziewczę urocze.\n"+
+                "Kiedy płaczesz ja szlocham, gdy się śmiejesz i ja chichoczę.");
+            }
+            else
+            {
+                Description("Tabliczka: Dzięki temu kielichowi pragnienie nie będzie twoim problemem.");
+            }
+        }
+    }
+    public void Vessel()
+    {
+        if(commandsList.contains("naczynie"))
+        {
+            System.out.println("Podchodzisz do naczynia i napełniasz je wodą z skrzynki nagle jedna ze ścian się przesuwa i odkrywa przejście");
+            CommandManager("remove","naczynie");
+            CommandManager("add","wejscie");
         }
     }
     public void Sleep(UnitStats Player)

@@ -191,6 +191,22 @@ public class UnitStats
             }
         }
     }
+    public void CombatStatusDown()
+    {
+        for(int i=0;i<CurrentStatuses.size();i++)
+        {
+            //System.out.println(CurrentStatuses.get(i).ReturnName()+":"+CurrentStatuses.get(i).ReturnDuration()+" - "+AllStatus.Poison.ReturnDuration());
+            if(CurrentStatuses.get(i).ReturnType().equals(Status.CombatTime))
+            {   
+                CurrentStatuses.get(i).durationDown();  
+                if(CurrentStatuses.get(i).ReturnDuration() <= 0)
+                {    
+                    RemoveStatus(CurrentStatuses.get(i));
+                    i-=1;
+                }
+            }
+        }
+    }
     public Integer AmountOfStatuses()
     {
         return CurrentStatuses.size();
