@@ -23,13 +23,13 @@ public class AllLocations
     new ArrayList<String>(Arrays.asList(new String[]{"polnoc","zachod","chatka","postac"})));
 
     public static Location RoadLocation = new Location(Road,"Droga",Visuals.GramlinVisual(),
-    new ArrayList<String>(Arrays.asList(new String[]{"wschod","walka","zachod"})));   //Dokończyć usunąć komendę zachod
+    new ArrayList<String>(Arrays.asList(new String[]{"wschod","walka"})));
 
     public static Location VillageLocation = new Location(Village,"Wioska Dróżka",Visuals.VillageVisual(),
     new ArrayList<String>(Arrays.asList(new String[]{"wschod","platnerz","alchemik","karczma"})));
 
     public static Location CartLocation = new Location(Cart,"Zniszczony wóz",Visuals.RaptorVisual(),
-    new ArrayList<String>(Arrays.asList(new String[]{"poludnie","walka","polnoc"}))); //Dokończyć usunąć komendę polnoc
+    new ArrayList<String>(Arrays.asList(new String[]{"poludnie","walka"})));
 
     public static Location TownLocation = new Location(Town,"Miasteczko Piachy",Visuals.TownVisual(),
     new ArrayList<String>(Arrays.asList(new String[]{"poludnie","wschod","zachod","karczma","kowal"})));
@@ -43,6 +43,6 @@ public class AllLocations
     public static Location CaveQuestLocation = new Location(CaveQuest,"Statua",Visuals.ChestVisual(),
     new ArrayList<String>(Arrays.asList(new String[]{"powrot","tekst","skrzynka"})));
 
-    public static Location LastRoomLocation = new Location(LastRoom,"Pokój z artefaktem",Visuals.EmptyVisual(),
+    public static Location LastRoomLocation = new Location(LastRoom,"Pokój z artefaktem",Visuals.VesselVisual(),
     new ArrayList<String>(Arrays.asList(new String[]{"tekst","kielich"})));
 }

@@ -1,1 +1,2 @@
-Prosta gra w konsoli w której za pomocą komend wykonuje się wybrane akcje.
+Przygodowa konsolowa gra, w której za pomocą komend wykonuje się różne akcje
+

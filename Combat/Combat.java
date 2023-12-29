@@ -219,6 +219,12 @@ public class Combat
                                             DefenceValue = EnemyStats.ReturnArmor();
                                             newEnemyStatus.add(AllStatus.CounterAttack);
                                         }
+                                        else if(EnemyActions.get(x).equals(AllSkills.StunAttack))
+                                        {
+                                            DefenceValue = EnemyStats.ReturnArmor();
+                                            EnemyStats.ChangeMana(5);
+                                            AdditionalDMessage = EnemyStats.ReturnName()+" odzyskuje 3 punkty akcji";
+                                        }
                                         else if(EnemyActions.get(y).equals(AllSkills.Wait))
                                         {
                                             if(!PlayerStats.ReturnAllStatuses().contains(AllStatus.PenetrationAttack))
@@ -242,6 +248,11 @@ public class Combat
                                             }
                                             EnemyStats.ChangeMana(EnemyActions.get(y).ReturnCost());    //Odnowienie kosztu
                                         }
+                                        else if(EnemyActions.get(y).equals(AllSkills.LaserAttack)) //Blok idealny
+                                        {
+                                            DefenceValue = AttackValue;
+                                        }
+                                        //Leczenie lub atak
                                         if(PlayerActions.get(x).equals(AllSkills.Heal))
                                         {
                                             PlayerStats.ChangeHP(AttackValue);
@@ -255,7 +266,6 @@ public class Combat
                                         {
                                             EnemyStats.ChangeMana(-2);
                                         }
-                                        //Dokończyć
                                         if(PlayerStats.ReturnAllStatuses().contains(AllStatus.CounterAttack))        //Kontraatak
                                         {
                                             System.out.println("--- "+EnemyStats.ReturnName()+" Wykonuje Kontraatak ---");
@@ -410,6 +420,11 @@ public class Combat
                                 AttackValue = new Integer(( (int) Math.ceil((double) EnemyStats.ReturnDMG()*1.5)));
                                 newEnemyStatus = CombatCommands.AttackStatuses(EnemyStats.ReturnAllStatuses());
                             }
+                            else if(EnemyActions.get(y).equals(AllSkills.StunAttack)) //Ogłuszający atak
+                            {
+                                AttackValue = new Integer(( (int) Math.ceil((double) EnemyStats.ReturnDMG()/5)));
+                                newEnemyStatus = CombatCommands.AttackStatuses(EnemyStats.ReturnAllStatuses());
+                            }
                             else if(EnemyActions.get(y).equals(AllSkills.biteAttack)) //Ugryzienie
                             {
                                 AttackValue = new Integer(( (int) Math.ceil((double) EnemyStats.ReturnDMG()/2)));
@@ -426,12 +441,19 @@ public class Combat
                                 newEnemyStatus = CombatCommands.AttackStatuses(EnemyStats.ReturnAllStatuses());
                                 newEnemyStatus.add(AllStatus.Bleed);
                             }
+                            else if(EnemyActions.get(y).equals(AllSkills.LaserAttack)) //Laserowy strzał
+                            {
+                                AttackValue = new Integer(EnemyStats.ReturnDMG()*2);
+                                newEnemyStatus = CombatCommands.AttackStatuses(EnemyStats.ReturnAllStatuses());
+                                AttackValue += PlayerStats.ReturnArmor();    //Dodanie wartości pancerza (ignorowanie tej wartości)
+                            }
                             
                             //Akcja Defensywna gracza
                             Boolean PlayerActionDone = false;
                             while(!PlayerActionDone)
                             {
                                 //Dane
+                                System.out.println("+--------------------------------+");
                                 System.out.println(EnemyActions.get(y).ReturnName("O")+" - Wartość Ataku = "+AttackValue);    //Wypisanie akcji
                                 CombatCommands.CombatWindow(PlayerStats, EnemyStats, visual);    //Wyświetlenie okna walki
                                 System.out.println("Dostępne akcje (Defensywa)");
@@ -532,9 +554,14 @@ public class Combat
                                 EnemyStats.ChangeMana(2);
                                 System.out.println(EnemyStats.ReturnName()+" Odzyskuje 2 punkty akcji");
                             }
-                            if(EnemyActions.get(y).equals(AllSkills.jumpAttack) && AttackValue > DefenceValue)    //Odnowienie PA
+                            if(EnemyActions.get(y).equals(AllSkills.jumpAttack) && AttackValue > DefenceValue)    //Doskok utrat PA
                             {
                                 PlayerStats.ChangeMana(-1);
+                                System.out.println("Tracisz 1 punkt akcji");
+                            }
+                            if(EnemyActions.get(y) == AllSkills.StunAttack)     //Ogłuszenie
+                            {
+                                PlayerStats.ChangeMana(-2);
                                 System.out.println("Tracisz 2 punkty akcji");
                             }
                             if(EnemyStats.ReturnAllStatuses().contains(AllStatus.CounterAttack))        //Kontraatak

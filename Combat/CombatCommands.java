@@ -66,10 +66,13 @@ public class CombatCommands {
                 System.out.println("Atak zadał "+(-1*Diffrence)+" obrażeń");
                 for(int i=0;i<AttackerStatus.size();i++)
                 {
-                    Deffender.AddStatus(AttackerStatus.get(i));
-                    if(!AttackerStatus.get(i).equals(AllStatus.CounterAttack))
+                    if(!Deffender.ReturnAllStatuses().contains(AllStatus.Mechanism))
                     {
-                        System.out.println("Nałożono efekt: "+AttackerStatus.get(i).ReturnName());
+                        Deffender.AddStatus(AttackerStatus.get(i));
+                        if(!AttackerStatus.get(i).equals(AllStatus.CounterAttack))
+                        {
+                            System.out.println("Nałożono efekt: "+AttackerStatus.get(i).ReturnName());
+                        }
                     }
                 }
                 for(int i=0;i<DefenderStatus.size();i++)
@@ -91,10 +94,13 @@ public class CombatCommands {
                     }
                     else
                     {
-                        Deffender.AddStatus(AttackerStatus.get(i));
-                        if(!AttackerStatus.get(i).equals(AllStatus.CounterAttack))
+                        if(!Deffender.ReturnAllStatuses().contains(AllStatus.Mechanism))
                         {
-                            System.out.println("Otrzymano efekt: "+AttackerStatus.get(i).ReturnName());
+                            Deffender.AddStatus(AttackerStatus.get(i));
+                            if(!AttackerStatus.get(i).equals(AllStatus.CounterAttack))
+                            {
+                                System.out.println("Otrzymano efekt: "+AttackerStatus.get(i).ReturnName());
+                            }
                         }
                     }
                 }

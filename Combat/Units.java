@@ -5,8 +5,7 @@ import java.util.Arrays;
 
 public class Units 
 {
-    //Dokończyć zmienić manę na 9 i złoto na 0 ,dmg na 6
-    public static UnitStats Ryszard = new UnitStats("Ryszard",50,100,15,2,6,50,
+    public static UnitStats Ryszard = new UnitStats("Ryszard",50,6,9,2,6,0,
 new ArrayList<Skills>(Arrays.asList(new Skills[]{AllSkills.lightAttack,AllSkills.normalAttack,AllSkills.heavyAttack})),
     new ArrayList<Status>());    
     
@@ -19,10 +18,10 @@ new ArrayList<Skills>(Arrays.asList(new Skills[]{AllSkills.lightAttack,AllSkills
     new ArrayList<Status>());
 
     public static UnitStats BloodThister = new UnitStats("Krwiopijec",50,14,8,5,5,35,
-new ArrayList<Skills>(Arrays.asList(new Skills[]{/*AllSkills.counterAttack,*/AllSkills.heavyAttack,/*AllSkills.normalAttack*/})),
+new ArrayList<Skills>(Arrays.asList(new Skills[]{AllSkills.counterAttack,AllSkills.heavyAttack,AllSkills.normalAttack})),
     new ArrayList<Status>(Arrays.asList(new Status[]{AllStatus.LifeSteal,AllStatus.Thorns})));
 
-    public static UnitStats Golem = new UnitStats("Golem",100,10,8,5,1,50,
-    new ArrayList<Skills>(Arrays.asList(new Skills[]{AllSkills.counterAttack,AllSkills.heavyAttack,AllSkills.StunAttack,AllSkills.LaserAttack})),
+    public static UnitStats Golem = new UnitStats("Golem",100,10,12,5,1,50,
+new ArrayList<Skills>(Arrays.asList(new Skills[]{AllSkills.heavyAttack,AllSkills.StunAttack,AllSkills.LaserAttack})),
     new ArrayList<Status>(Arrays.asList(new Status[]{AllStatus.Mechanism})));
 }
